@@ -18,8 +18,20 @@ class ServiceController extends Controller
     }
 
     public function store(Request $request) {
-        Service::create($request->all());
-        return redirect()->route('services.index');
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'category' => 'required|string|max:100',
+            'description' => 'nullable|string',
+            'website_url' => 'nullable|url'
+        ]);
+        
+        Service::create([
+            'name' => $request->name,
+            'category' => $request->category,
+            'description' => $request->description,
+            'website_url' => $request->website_url
+        ]);
+        return redirect()->route('services.index')->with('success', 'Service created successfully!');
     }
 
     public function show(string $id) {
@@ -33,13 +45,25 @@ class ServiceController extends Controller
     }
 
     public function update(Request $request, string $id) {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'category' => 'required|string|max:100',
+            'description' => 'nullable|string',
+            'website_url' => 'nullable|url'
+        ]);
+        
         $service = Service::find($id);
-        $service->update($request->all());
-        return redirect()->route('services.index');
+        $service->update([
+            'name' => $request->name,
+            'category' => $request->category,
+            'description' => $request->description,
+            'website_url' => $request->website_url
+        ]);
+        return redirect()->route('services.index')->with('success', 'Service updated successfully!');
     }
 
     public function destroy(string $id) {
         Service::find($id)->delete();
-        return redirect()->route('services.index');
+        return redirect()->route('services.index')->with('success', 'Service deleted successfully!');
     }
 }
