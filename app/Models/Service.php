@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class Service extends Model
 {
     protected $fillable = [
+        'user_id',
         'name',
         'category',
         'website_url',
@@ -16,5 +17,9 @@ class Service extends Model
 
     public function subscriptions(): HasMany {
         return $this->hasMany(Subscription::class);
+    }
+
+    public function user() {
+        return $this->belongsTo(User::class);
     }
 }

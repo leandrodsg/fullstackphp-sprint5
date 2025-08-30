@@ -4,7 +4,7 @@
 
 O TechSubs é uma aplicação web desenvolvida em Laravel para gerenciamento de assinaturas de serviços digitais. O sistema permite que usuários controlem suas assinaturas ativas, monitorem gastos mensais e organizem seus serviços digitais de forma centralizada.
 
-### Fase 3 - Models Básicos
+### PR 3 - Models Básicos
 
 - Criação dos Models Service e Subscription com Eloquent ORM
 - Implementação de relacionamentos entre User, Service e Subscription

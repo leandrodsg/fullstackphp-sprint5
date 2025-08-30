@@ -127,6 +127,12 @@ return [
             'path' => storage_path('logs/laravel.log'),
         ],
 
+        'email_recovery' => [
+            'driver' => 'single',
+            'path' => storage_path('logs/email_recovery.txt'),
+            'level' => 'debug',
+        ],
+
     ],
 
 ];
