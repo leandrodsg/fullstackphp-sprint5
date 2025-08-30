@@ -6,20 +6,27 @@ use App\Http\Controllers\Controller;
 use App\Models\Subscription;
 use App\Models\Service;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class SubscriptionController extends Controller
 {
-    public function index() {
-        $subscriptions = Subscription::with('service')->get();
+    public function index() 
+    {
+        $subscriptions = Subscription::with('service')
+            ->where('user_id', Auth::id())
+            ->get();
+            
         return view('subscriptions.index', compact('subscriptions'));
     }
 
-    public function create() {
+    public function create() 
+    {
         $services = Service::all();
         return view('subscriptions.create', compact('services'));
     }
 
-    public function store(Request $request) {
+    public function store(Request $request) 
+    {
         $request->validate([
             'service_id' => 'required|exists:services,id',
             'plan' => 'required|string|max:100',
@@ -30,7 +37,7 @@ class SubscriptionController extends Controller
         ]);
         
         Subscription::create([
-            'user_id' => 1,
+            'user_id' => Auth::id(),
             'service_id' => $request->service_id,
             'plan' => $request->plan,
             'price' => $request->price,
@@ -38,21 +45,33 @@ class SubscriptionController extends Controller
             'next_billing_date' => $request->next_billing_date,
             'status' => $request->status
         ]);
-        return redirect()->route('subscriptions.index')->with('success', 'Subscription created successfully!');
+        
+        return redirect()->route('subscriptions.index')
+            ->with('success', 'Subscription created successfully!');
     }
 
-    public function show(string $id) {
-        $subscription = Subscription::with('service')->find($id);
+    public function show(string $id) 
+    {
+        $subscription = Subscription::with('service')
+            ->where('user_id', Auth::id())
+            ->findOrFail($id);
+            
         return view('subscriptions.show', compact('subscription'));
     }
 
-    public function edit(string $id) {
-        $subscription = Subscription::with('service')->find($id);
+    public function edit(string $id) 
+    {
+        $subscription = Subscription::with('service')
+            ->where('user_id', Auth::id())
+            ->findOrFail($id);
+            
         $services = Service::all();
+        
         return view('subscriptions.edit', compact('subscription', 'services'));
     }
 
-    public function update(Request $request, string $id) {
+    public function update(Request $request, string $id) 
+    {
         $request->validate([
             'service_id' => 'required|exists:services,id',
             'plan' => 'required|string|max:100',
@@ -62,7 +81,9 @@ class SubscriptionController extends Controller
             'status' => 'required|in:active,cancelled'
         ]);
         
-        $subscription = Subscription::find($id);
+        $subscription = Subscription::where('user_id', Auth::id())
+            ->findOrFail($id);
+            
         $subscription->update([
             'service_id' => $request->service_id,
             'plan' => $request->plan,
@@ -71,11 +92,18 @@ class SubscriptionController extends Controller
             'next_billing_date' => $request->next_billing_date,
             'status' => $request->status
         ]);
-        return redirect()->route('subscriptions.index')->with('success', 'Subscription updated successfully!');
+        
+        return redirect()->route('subscriptions.index')
+            ->with('success', 'Subscription updated successfully!');
     }
 
-    public function destroy(string $id) {
-        Subscription::find($id)->delete();
-        return redirect()->route('subscriptions.index')->with('success', 'Subscription deleted successfully!');
+    public function destroy(string $id) 
+    {
+        Subscription::where('user_id', Auth::id())
+            ->findOrFail($id)
+            ->delete();
+            
+        return redirect()->route('subscriptions.index')
+            ->with('success', 'Subscription deleted successfully!');
     }
 }
