@@ -39,7 +39,7 @@ Routes Implementation:
 - Added resource routes for subscriptions: `Route::resource('subscriptions', SubscriptionController::class)`
 - Routes are defined in `routes/web.php`
 
-Controllers Created:**
+Controllers Created:
 - `ServiceController` with seven standard methods:
 - `index()` - displays list of services
 - `create()` - shows form to create new service
