@@ -24,4 +24,12 @@ class Service extends Model
     public function user() {
         return $this->belongsTo(User::class);
     }
+
+    /**
+     * Scope to filter services by user
+     */
+    public function scopeForUser($query, $userId = null) {
+        $userId = $userId ?? auth()->id();
+        return $query->where('user_id', $userId);
+    }
 }
