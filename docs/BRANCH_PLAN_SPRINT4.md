@@ -126,16 +126,3 @@ Commits sugeridos:
 - `test: add subscription billing unit test`
 
 ---
-## 8. Branch: `docs/category-clarification`
-Objetivo: Responder feedback sobre categoria “Streaming”.
-
-Tarefas:
-- Adicionar seção "Categorias" no `README.md`
-- Comentar no model `Service` significado das categorias
-- Especificar exemplos: Streaming, SaaS, Infra, Música, Gaming
-
-Commits sugeridos:
-- `docs: clarify service categories`
-- `docs: annotate Service model with category docs`
-
----
