@@ -10,9 +10,6 @@ Este documento organiza as melhorias internas do Sprint 4 para facilitar a futur
 5. `feat/email-verification`
 6. `feat/subscription-billing-skeleton`
 7. `test/base-scenarios`
-8. `docs/category-clarification`
-9. `docs/readme-prep`
-10. `docs/commit-guidelines` (opcional)
 
 ---
 ## 1. Branch: `refactor/form-requests`

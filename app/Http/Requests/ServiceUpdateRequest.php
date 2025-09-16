@@ -13,9 +13,16 @@ class ServiceUpdateRequest extends FormRequest
 
     public function rules(): array
     {
+        $serviceId = $this->route('service');
+        
         return [
-            'name' => 'required|string|max:255',
-            'category' => 'required|string|max:100',
+            'name' => [
+                'required',
+                'string',
+                'max:255',
+                'unique:services,name,' . $serviceId . ',id,user_id,' . auth()->id()
+            ],
+            'category' => 'required|in:Streaming,Software,Cloud Storage,Music,Gaming,Other',
             'description' => 'nullable|string',
             'website_url' => 'nullable|url'
         ];
