@@ -72,7 +72,7 @@ Commits sugeridos:
 Objetivo: Reforçar segurança de senha conforme feedback.
 
 Tarefas:
-- Criar `app/Rules/StrongPassword.php` (mín. 12 chars, upper, lower, number, special)
+- Criar `app/Rules/StrongPassword.php` (mín. 10 chars, upper, lower, number, special)
 - Integrar rule na criação de usuários (via `RegisterUserRequest` ou diretamente)
 - Mensagens de erro claras
 - Ajustar documentação se necessário
@@ -80,8 +80,6 @@ Tarefas:
 Commits sugeridos:
 - `feat: add StrongPassword rule`
 - `feat: enforce strong password in registration`
-
-Regex sugerida: `^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_\-+=\[\]{};:'",.<>?/\\|`~]).{12,}$`
 
 ---
 ## 5. Branch: `feat/email-verification`
