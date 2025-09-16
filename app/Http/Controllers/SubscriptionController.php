@@ -15,7 +15,7 @@ class SubscriptionController extends Controller
     public function index() 
     {
         $subscriptions = Subscription::with('service')
-            ->where('user_id', Auth::id())
+            ->forUser()
             ->get();
             
         return view('subscriptions.index', compact('subscriptions'));
@@ -23,7 +23,7 @@ class SubscriptionController extends Controller
 
     public function create() 
     {
-        $services = Service::all();
+        $services = Service::forUser()->get();
         return view('subscriptions.create', compact('services'));
     }
 
@@ -47,7 +47,7 @@ class SubscriptionController extends Controller
     public function show(string $id) 
     {
         $subscription = Subscription::with('service')
-            ->where('user_id', Auth::id())
+            ->forUser()
             ->findOrFail($id);
             
         return view('subscriptions.show', compact('subscription'));
@@ -56,10 +56,10 @@ class SubscriptionController extends Controller
     public function edit(string $id) 
     {
         $subscription = Subscription::with('service')
-            ->where('user_id', Auth::id())
+            ->forUser()
             ->findOrFail($id);
             
-        $services = Service::all();
+        $services = Service::forUser()->get();
         
         return view('subscriptions.edit', compact('subscription', 'services'));
     }
@@ -67,7 +67,7 @@ class SubscriptionController extends Controller
     public function update(SubscriptionUpdateRequest $request, string $id) 
     {
         $data = $request->validated();
-        $subscription = Subscription::where('user_id', Auth::id())->findOrFail($id);
+        $subscription = Subscription::forUser()->findOrFail($id);
         $subscription->update([
             'service_id' => $data['service_id'],
             'plan' => $data['plan'],
@@ -83,7 +83,7 @@ class SubscriptionController extends Controller
 
     public function destroy(string $id) 
     {
-        Subscription::where('user_id', Auth::id())
+        Subscription::forUser()
             ->findOrFail($id)
             ->delete();
             

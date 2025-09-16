@@ -29,4 +29,26 @@ class Subscription extends Model
     public function service(): BelongsTo {
         return $this->belongsTo(Service::class);
     }
+
+    /**
+     * Scope to filter subscriptions by user
+     */
+    public function scopeForUser($query, $userId = null) {
+        $userId = $userId ?? auth()->id();
+        return $query->where('user_id', $userId);
+    }
+
+    /**
+     * Check if the subscription is due (past the billing date)
+     */
+    public function isDue(): bool {
+        return $this->next_billing_date < now()->toDate();
+    }
+
+    /**
+     * Advance the billing date by one month
+     */
+    public function advanceBillingDate(): void {
+        $this->update(['next_billing_date' => $this->next_billing_date->addMonth()]);
+    }
 }

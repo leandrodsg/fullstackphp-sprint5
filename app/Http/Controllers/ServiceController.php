@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\Auth;
 class ServiceController extends Controller
 {
     public function index() {
-        $userServices = Service::where('user_id', Auth::id())->get();
+        $userServices = Service::forUser()->get();
         return view('services.index', ['services' => $userServices]);
     }
 
@@ -33,18 +33,18 @@ class ServiceController extends Controller
     }
 
     public function show(string $id){
-        $service = Service::where('user_id', Auth::id())->findOrFail($id);
+        $service = Service::forUser()->findOrFail($id);
         return view('services.show', ['service' => $service]);
     }
 
     public function edit(string $id){
-        $service = Service::where('user_id', Auth::id())->findOrFail($id);
+        $service = Service::forUser()->findOrFail($id);
         return view('services.edit', ['service' => $service]);
     }
 
     public function update(ServiceUpdateRequest $request, string $id)  {
         $data = $request->validated();
-        $service = Service::where('user_id', Auth::id())->findOrFail($id);
+        $service = Service::forUser()->findOrFail($id);
         $service->update([
             'name' => $data['name'],
             'category' => $data['category'],
@@ -56,7 +56,7 @@ class ServiceController extends Controller
     }
 
     public function destroy(string $id) {
-        $service = Service::where('user_id', Auth::id())->findOrFail($id);
+        $service = Service::forUser()->findOrFail($id);
         $service->delete();
 
         return redirect()->route('services.index')->with('success', 'Service deleted successfully!');
