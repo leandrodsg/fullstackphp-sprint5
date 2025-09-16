@@ -10,9 +10,6 @@ Este documento organiza as melhorias internas do Sprint 4 para facilitar a futur
 5. `feat/email-verification`
 6. `feat/subscription-billing-skeleton`
 7. `test/base-scenarios`
-8. `docs/category-clarification`
-9. `docs/readme-prep`
-10. `docs/commit-guidelines` (opcional)
 
 ---
 ## 1. Branch: `refactor/form-requests`
@@ -72,7 +69,7 @@ Commits sugeridos:
 Objetivo: Reforçar segurança de senha conforme feedback.
 
 Tarefas:
-- Criar `app/Rules/StrongPassword.php` (mín. 12 chars, upper, lower, number, special)
+- Criar `app/Rules/StrongPassword.php` (mín. 10 chars, upper, lower, number, special)
 - Integrar rule na criação de usuários (via `RegisterUserRequest` ou diretamente)
 - Mensagens de erro claras
 - Ajustar documentação se necessário
@@ -80,8 +77,6 @@ Tarefas:
 Commits sugeridos:
 - `feat: add StrongPassword rule`
 - `feat: enforce strong password in registration`
-
-Regex sugerida: `^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_\-+=\[\]{};:'",.<>?/\\|`~]).{12,}$`
 
 ---
 ## 5. Branch: `feat/email-verification`
@@ -128,78 +123,3 @@ Commits sugeridos:
 - `test: add subscription billing unit test`
 
 ---
-## 8. Branch: `docs/category-clarification`
-Objetivo: Responder feedback sobre categoria “Streaming”.
-
-Tarefas:
-- Adicionar seção "Categorias" no `README.md`
-- Comentar no model `Service` significado das categorias
-- Especificar exemplos: Streaming, SaaS, Infra, Música, Gaming
-
-Commits sugeridos:
-- `docs: clarify service categories`
-- `docs: annotate Service model with category docs`
-
----
-## 9. Branch: `docs/readme-prep`
-Objetivo: Enriquecer README com instruções de setup e visão futura (sem implementar ainda).
-
-Tarefas:
-- Passos: clone, `.env`, `composer install`, `migrate`, `seed`, `serve`
-- Seção: Próximos Passos (API REST, Passport, roles, billing job)
-- Seção: Convenção de commits (resumo) se não for criar branch dedicada
-
-Commits sugeridos:
-- `docs: add detailed setup instructions`
-- `docs: add future evolution section`
-
----
-## 10. Branch: `docs/commit-guidelines` (opcional)
-Objetivo: Formalizar padrão de mensagens.
-
-Tarefas:
-- Criar `CONTRIBUTING.md` ou seção no README
-- Definir formato: `<type>: <imperative summary>`
-- Tipos: feat, fix, refactor, chore, docs, test, perf, build
-- Linha extra opcional com contexto/tickets
-
-Commits sugeridos:
-- `docs: add commit message guidelines`
-
----
-## Extras / Notas
-- Cada PR deve ser pequeno (1 a 3 commits) para mostrar granularidade.
-- Evitar misturar refactor + feature no mesmo commit.
-- Não introduzir dependências de API/Passport nesta fase.
-- Após merge de cada branch, atualizar local e iniciar próxima para evitar conflitos.
-
----
-## Fluxo Git sugerido (exemplo)
-```bash
-# atualizar base
-git checkout main
-git pull
-
-# criar branch
-git checkout -b refactor/form-requests
-
-# fazer commits
-# ...
-
-git push -u origin refactor/form-requests
-# abrir PR e merge
-```
-
----
-## Checklist Rápido de Conclusão
-- [ ] Validações externas centralizadas
-- [ ] Models com métodos de domínio
-- [ ] Resources criados
-- [ ] Senha forte exigida
-- [ ] Verificação de e-mail ativada
-- [ ] Esqueleto de billing pronto
-- [ ] Testes iniciais criados
-- [ ] Documentação enriquecida
-- [ ] Convenção de commits publicada
-
-Pronto: base madura para evolução em API no próximo ciclo.

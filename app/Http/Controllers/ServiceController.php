@@ -4,12 +4,14 @@ namespace App\Http\Controllers;
 
 use App\Models\Service;
 use Illuminate\Http\Request;
+use App\Http\Requests\ServiceStoreRequest;
+use App\Http\Requests\ServiceUpdateRequest;
 use Illuminate\Support\Facades\Auth;
 
 class ServiceController extends Controller
 {
     public function index() {
-        $userServices = Service::where('user_id', Auth::id())->get();
+        $userServices = Service::forUser()->get();
         return view('services.index', ['services' => $userServices]);
     }
 
@@ -17,19 +19,13 @@ class ServiceController extends Controller
         return view('services.create');
     }
 
-    public function store(Request $request) {
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'category' => 'required|string|max:100',
-            'description' => 'nullable|string',
-            'website_url' => 'nullable|url'
-        ]);
-
+    public function store(ServiceStoreRequest $request) {
+        $data = $request->validated();
         Service::create([
-            'name' => $validated['name'],
-            'category' => $validated['category'],
-            'description' => $validated['description'],
-            'website_url' => $validated['website_url'],
+            'name' => $data['name'],
+            'category' => $data['category'],
+            'description' => $data['description'] ?? null,
+            'website_url' => $data['website_url'] ?? null,
             'user_id' => Auth::id()
         ]);
 
@@ -37,37 +33,30 @@ class ServiceController extends Controller
     }
 
     public function show(string $id){
-        $service = Service::where('user_id', Auth::id())->findOrFail($id);
+        $service = Service::forUser()->findOrFail($id);
         return view('services.show', ['service' => $service]);
     }
 
     public function edit(string $id){
-        $service = Service::where('user_id', Auth::id())->findOrFail($id);
+        $service = Service::forUser()->findOrFail($id);
         return view('services.edit', ['service' => $service]);
     }
 
-    public function update(Request $request, string $id)  {
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'category' => 'required|string|max:100',
-            'description' => 'nullable|string',
-            'website_url' => 'nullable|url'
-        ]);
-
-        $service = Service::where('user_id', Auth::id())->findOrFail($id);
-
+    public function update(ServiceUpdateRequest $request, string $id)  {
+        $data = $request->validated();
+        $service = Service::forUser()->findOrFail($id);
         $service->update([
-            'name' => $validated['name'],
-            'category' => $validated['category'],
-            'description' => $validated['description'],
-            'website_url' => $validated['website_url']
+            'name' => $data['name'],
+            'category' => $data['category'],
+            'description' => $data['description'] ?? null,
+            'website_url' => $data['website_url'] ?? null
         ]);
 
         return redirect()->route('services.index')->with('success', 'Service updated successfully!');
     }
 
     public function destroy(string $id) {
-        $service = Service::where('user_id', Auth::id())->findOrFail($id);
+        $service = Service::forUser()->findOrFail($id);
         $service->delete();
 
         return redirect()->route('services.index')->with('success', 'Service deleted successfully!');
