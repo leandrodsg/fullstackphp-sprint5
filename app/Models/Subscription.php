@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use App\Events\SubscriptionBillingAdvanced;
 
 class Subscription extends Model
 {
@@ -50,5 +51,20 @@ class Subscription extends Model
      */
     public function advanceBillingDate(): void {
         $this->update(['next_billing_date' => $this->next_billing_date->addMonth()]);
+    }
+
+    /**
+     * Advance one billing cycle (monthly or annual based on plan)
+     */
+    public function advanceOneCycle(): void {
+        // Detect if plan is annual or monthly
+        if (stripos($this->plan, 'annual') !== false || stripos($this->plan, 'yearly') !== false) {
+            $this->update(['next_billing_date' => $this->next_billing_date->addYear()]);
+        } else {
+            // Default to monthly for all other plans
+            $this->advanceBillingDate();
+        }
+        
+        SubscriptionBillingAdvanced::dispatch($this);
     }
 }
