@@ -210,6 +210,7 @@ Cada branch deve seguir Test-Driven Development:
 1. Escrever testes para a funcionalidade antes da implementação
 2. Implementar código mínimo para fazer testes passarem
 3. Refatorar mantendo testes verdes
+4. Garantir cobertura de testes adequada
 
 ### Requisitos Atendidos por Nível
 
