@@ -8,7 +8,6 @@ Configurar a autenticação de API usando Laravel Passport, garantindo que o sis
 
 ## Passos realizados
 
-
 1. Instalação do pacote Laravel Passport via Composer
 	- Comando executado:
 	  composer require laravel/passport
