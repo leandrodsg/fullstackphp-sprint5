@@ -18,7 +18,10 @@ return new class extends Migration
             $table->string('secret')->nullable();
             $table->string('provider')->nullable();
             $table->text('redirect_uris');
-            $table->text('grant_types');
+            $table->text('grant_types')->nullable();
+            $table->text('scopes')->nullable();
+            $table->boolean('personal_access_client')->default(false);
+            $table->boolean('password_client')->default(false);
             $table->boolean('revoked');
             $table->timestamps();
         });
