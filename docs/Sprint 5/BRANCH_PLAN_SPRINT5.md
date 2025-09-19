@@ -93,7 +93,6 @@ Tarefas:
 - Criar Api/AuthController com métodos:
   - POST /api/v1/register (registro de usuários)
   - POST /api/v1/login (login com token)
-  - POST /api/v1/logout (revogação de token)
 - Criar Api/ProfileController com métodos:
   - GET /api/v1/profile (dados do usuário autenticado)
   - PUT /api/v1/change-password (alteração de senha)
