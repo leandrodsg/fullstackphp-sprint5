@@ -8,7 +8,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
 class ServiceResource extends JsonResource
 {
     /**
-     * Transform the service resource into an array.
+     * Transform the resource into an array.
      *
      * @return array<string, mixed>
      */
@@ -20,8 +20,10 @@ class ServiceResource extends JsonResource
             'category' => $this->category,
             'description' => $this->description,
             'website_url' => $this->website_url,
-            'created_at' => $this->created_at,
-            'updated_at' => $this->updated_at,
+            'user_id' => $this->user_id,
+            'subscriptions_count' => $this->subscriptions()->count(),
+            'created_at' => $this->created_at->format('Y-m-d H:i:s'),
+            'updated_at' => $this->updated_at->format('Y-m-d H:i:s'),
         ];
     }
 }
