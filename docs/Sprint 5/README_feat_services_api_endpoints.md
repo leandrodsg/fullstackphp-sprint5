@@ -44,6 +44,11 @@ Esta implementação foi facilitada pelo trabalho preparatório realizado no Spr
 	  - Proteção contra acesso não autenticado
 	  - Isolamento de dados entre usuários
 
+5. Correção de configuração de testes
+	- Ajustado uso de Laravel Passport ao invés de Sanctum nos testes
+	- Importação correta: use Laravel\Passport\Passport
+	- Método de autenticação: Passport::actingAs($user)
+
 ## Endpoints implementados
 
 GET /api/v1/services - Lista serviços do usuário autenticado
