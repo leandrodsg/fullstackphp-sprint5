@@ -43,8 +43,5 @@ Estabelecer base de testes para futura expansão (API/TDD) e identificar gaps de
 ## Como executar
 
 ```bash
-# Todos os novos testes (27 testes - 100% passando!)
 php artisan test --filter="ServiceCreationTest|SubscriptionCreationTest|SubscriptionBillingCycleTest|UserDataIsolationTest"
-
-# Resultado esperado: Tests: 27 passed (104 assertions)
 ```

@@ -68,3 +68,33 @@ Referências do problema:
 - https://laracasts.com/discuss/channels/laravel/passport-how-can-i-manually-revoke-access-token
 
 Comando: php artisan test --filter=AuthApiEndpointsTest
+
+## Correções de testes auxiliares
+
+Durante o desenvolvimento, foram identificados e corrigidos 4 problemas que causavam falhas nos testes:
+
+### 1. Handler.php - Erro "Undefined method 'getStatusCode'"
+Problema: Código tentava chamar `getStatusCode()` em qualquer exceção sem verificação de tipo
+Solução: Refatoração completa do método `render()` em `app/Exceptions/Handler.php`
+- Adicionados imports corretos: `HttpException` e `Throwable`
+- Substituída verificação `method_exists` por `instanceof HttpException`
+- Implementada lógica type-safe para obter status code
+- Mantém retorno JSON padronizado: `{"success": false, "message": "..."}`
+
+### 2. Rota Fallback da API sem estrutura padronizada
+Problema: Rota fallback retornava apenas `{'message': 'Not Found'}` 
+Solução: Corrigida rota fallback em `routes/api.php`
+- Alterado retorno para `{'success': false, 'message': 'Not Found'}`
+- Mantém consistência com padrão de resposta da API
+
+### 3. PassportAuthTest com rota incorreta
+Problema: Teste chamava `/api/user` mas rota estava em `/api/v1/user`
+Solução: Corrigida rota no teste `PassportAuthTest.php`
+- Alterado de `/api/user` para `/api/v1/user`
+- Mantém consistência com estrutura de rotas versionadas
+
+### 4. RegistrationTest com senha inadequada
+Problema: Teste usava senha "password" que não atendia aos requisitos da `StrongPassword`
+Solução: Atualizada senha no teste `RegistrationTest.php`
+- Alterado de "password" para "Password123!"
+- Atende todos os critérios: 10+ caracteres, maiúscula, minúscula, número e caractere especial

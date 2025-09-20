@@ -23,6 +23,15 @@ Route::prefix('v1')->group(function () {
     Route::get('/test', function () {
         return response()->json(['message' => 'API is working!']);
     });
+    
+    // Test route for base structure
+    Route::get('/test-base-response', function () {
+        return response()->json([
+            'success' => true,
+            'message' => 'Base response structure working',
+            'data' => null
+        ]);
+    });
 
     // Auth routes
     Route::post('/register', [AuthController::class, 'register']);
@@ -32,6 +41,7 @@ Route::prefix('v1')->group(function () {
     Route::middleware('auth:api')->group(function () {
         // Profile routes
         Route::get('/profile', [AuthController::class, 'profile']);
+        Route::get('/user', [AuthController::class, 'profile']); // Alias para compatibilidade com testes
         Route::put('/change-password', [AuthController::class, 'changePassword']);
         Route::post('/logout', [AuthController::class, 'logout']);
 
@@ -48,10 +58,19 @@ Route::prefix('v1')->group(function () {
 
         // Subscriptions routes
         Route::get('/subscriptions', [SubscriptionController::class, 'index']);
+        Route::post('/subscriptions', [SubscriptionController::class, 'store']);
+        Route::get('/subscriptions/{id}', [SubscriptionController::class, 'show']);
+        Route::put('/subscriptions/{id}', [SubscriptionController::class, 'update']);
+        Route::delete('/subscriptions/{id}', [SubscriptionController::class, 'destroy']);
+        Route::patch('/subscriptions/{id}/cancel', [SubscriptionController::class, 'cancel']);
+        Route::patch('/subscriptions/{id}/reactivate', [SubscriptionController::class, 'reactivate']);
     });
 });
 
 // Fallback route
 Route::fallback(function () {
-    return response()->json(['message' => 'Not Found'], 404);
+    return response()->json([
+        'success' => false,
+        'message' => 'Not Found'
+    ], 404);
 });
