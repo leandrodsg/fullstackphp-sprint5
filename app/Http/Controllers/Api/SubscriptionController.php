@@ -22,7 +22,7 @@ class SubscriptionController extends BaseController
             'plan' => 'required|string',
             'price' => 'required|numeric',
             'currency' => 'required|string',
-            'start_date' => 'required|date',
+            'next_billing_date' => 'required|date',
             'status' => 'required|string',
         ]);
         $data['user_id'] = Auth::id();
@@ -49,7 +49,7 @@ class SubscriptionController extends BaseController
             'plan' => 'required|string',
             'price' => 'required|numeric',
             'currency' => 'required|string',
-            'start_date' => 'required|date',
+            'next_billing_date' => 'required|date',
             'status' => 'required|string',
         ]);
         $subscription->update($data);
@@ -64,5 +64,25 @@ class SubscriptionController extends BaseController
         }
         $subscription->delete();
         return $this->responseSuccess(null, 'Subscription deleted');
+    }
+
+    public function cancel($id)
+    {
+        $subscription = Subscription::forUser()->find($id);
+        if (!$subscription) {
+            return $this->responseError('Subscription not found', 404);
+        }
+        $subscription->update(['status' => 'cancelled']);
+        return $this->responseSuccess($subscription, 'Subscription cancelled');
+    }
+
+    public function reactivate($id)
+    {
+        $subscription = Subscription::forUser()->find($id);
+        if (!$subscription) {
+            return $this->responseError('Subscription not found', 404);
+        }
+        $subscription->update(['status' => 'active']);
+        return $this->responseSuccess($subscription, 'Subscription reactivated');
     }
 }
