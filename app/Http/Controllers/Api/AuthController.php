@@ -113,4 +113,38 @@ class AuthController extends Controller
             'message' => 'Successfully logged out'
         ], 200);
     }
+
+    public function profile(Request $request)
+    {
+        $user = $request->user();
+        
+        return $this->json(true, 'Profile retrieved successfully', [
+            'user' => [
+                'id' => $user->id,
+                'name' => $user->name,
+                'email' => $user->email,
+                'role' => $user->role ?? 'user'
+            ]
+        ]);
+    }
+
+    public function changePassword(Request $request)
+    {
+        $data = $request->validate([
+            'current_password' => 'required',
+            'new_password' => 'required|min:8|confirmed',
+        ]);
+
+        $user = $request->user();
+        
+        if (!Hash::check($data['current_password'], $user->password)) {
+            return $this->json(false, 'Current password is incorrect', null, 400);
+        }
+
+        $user->update([
+            'password' => Hash::make($data['new_password'])
+        ]);
+
+        return $this->json(true, 'Password changed successfully');
+    }
 }
