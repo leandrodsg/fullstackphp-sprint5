@@ -16,7 +16,7 @@ class PassportAuthTest extends TestCase
         $user = User::factory()->create();
         Passport::actingAs($user);
 
-        $response = $this->getJson('/api/user');
+        $response = $this->getJson('/api/v1/user');
 
         $response->assertStatus(200);
     }
