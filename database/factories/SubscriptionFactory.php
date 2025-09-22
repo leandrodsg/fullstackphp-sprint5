@@ -13,13 +13,13 @@ class SubscriptionFactory extends Factory
     public function definition(): array
     {
         return [
-            'service_id' => 1, // Usar ID fixo que existe
+            'service_id' => 1,
             'plan' => $this->faker->randomElement(['Basic', 'Premium', 'Pro']),
             'price' => $this->faker->randomFloat(2, 5, 100),
             'currency' => 'USD',
             'next_billing_date' => $this->faker->dateTimeBetween('now', '+1 year'),
-            'status' => 'active', // Status fixo válido
-            'user_id' => 1, // Será sobrescrito nos testes
+            'status' => 'active',
+            'user_id' => 1,
         ];
     }
 }

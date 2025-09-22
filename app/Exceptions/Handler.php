@@ -18,20 +18,14 @@ class Handler extends ExceptionHandler
 
     public function render($request, Throwable $exception): Response
     {
-        // Se for uma requisição para API, retorna JSON padronizado
-        if ($request->is('api/*')) {
+        if ($request->expectsJson() || $request->is('api/*')) {
             $status = 500;
-            $message = 'An error occurred';
             
-            // Verifica se é uma HttpException para pegar o status code correto
             if ($exception instanceof HttpException) {
                 $status = $exception->getStatusCode();
             }
             
-            // Pega a mensagem da exceção se existir
-            if (!empty($exception->getMessage())) {
-                $message = $exception->getMessage();
-            }
+            $message = $exception->getMessage() ?: 'An error occurred';
 
             return response()->json([
                 'success' => false,
