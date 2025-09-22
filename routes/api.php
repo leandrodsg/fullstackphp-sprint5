@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\ServiceController;
 use App\Http\Controllers\Api\SubscriptionController;
+use App\Http\Controllers\Api\ReportController;
 
 /*
 |--------------------------------------------------------------------------
@@ -28,9 +29,18 @@ Route::prefix('v1')->group(function () {
     Route::get('/test-base-response', function () {
         return response()->json([
             'success' => true,
-            'message' => 'Base response structure working',
+            'message' => 'Base response working',
             'data' => null
         ]);
+    });
+    
+    // Test route for error response
+    Route::get('/test-error-response', function () {
+        return response()->json([
+            'success' => false,
+            'message' => 'Test error message',
+            'data' => null
+        ], 400);
     });
 
     // Auth routes
@@ -64,6 +74,9 @@ Route::prefix('v1')->group(function () {
         Route::delete('/subscriptions/{id}', [SubscriptionController::class, 'destroy']);
         Route::patch('/subscriptions/{id}/cancel', [SubscriptionController::class, 'cancel']);
         Route::patch('/subscriptions/{id}/reactivate', [SubscriptionController::class, 'reactivate']);
+
+        // Reports routes
+        Route::get('/reports/my-expenses', [ReportController::class, 'myExpenses']);
     });
 });
 
