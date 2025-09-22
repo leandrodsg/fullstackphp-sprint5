@@ -4,11 +4,11 @@
         
         <div class="space-x-4">
             @auth
-                <!-- Menus para usuários logados -->
+                <!-- Menus for logged in users -->
                 <a href="{{ url('/services') }}" class="text-white hover:text-gray-200">Services</a>
                 <a href="{{ url('/subscriptions') }}" class="text-white hover:text-gray-200">Subscriptions</a>
                 
-                <!-- Botão de Logout -->
+                <!-- Logout Button -->
                 <form method="POST" action="{{ route('logout') }}" class="inline">
                     @csrf
                     <button type="submit" class="text-white hover:text-gray-200 bg-transparent border-0 cursor-pointer">
@@ -16,7 +16,7 @@
                     </button>
                 </form>
             @else
-                <!-- Botões para usuários não logados -->
+                <!-- Buttons for non-logged users -->
                 <a href="{{ route('login') }}" class="text-white hover:text-gray-200">Login</a>
                 <a href="{{ route('register') }}" class="text-white hover:text-gray-200">Register</a>
             @endauth

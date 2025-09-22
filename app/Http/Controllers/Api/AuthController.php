@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\User;
+use App\Rules\StrongPassword;
 use Illuminate\Support\Facades\Hash;
 use Laravel\Passport\Client;
 use Illuminate\Support\Facades\DB;
@@ -55,7 +56,7 @@ class AuthController extends Controller
         $data = $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email',
-            'password' => 'required|min:8|confirmed'
+            'password' => ['required', 'confirmed', new StrongPassword()]
         ]);
 
         $user = User::create([
@@ -132,7 +133,7 @@ class AuthController extends Controller
     {
         $data = $request->validate([
             'current_password' => 'required',
-            'new_password' => 'required|min:8|confirmed',
+            'new_password' => ['required', 'confirmed', new StrongPassword()],
         ]);
 
         $user = $request->user();

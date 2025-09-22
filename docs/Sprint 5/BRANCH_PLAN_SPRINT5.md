@@ -140,37 +140,37 @@ Tarefas:
 - Validar testes passando
 
 ### 7. Branch: feat/reports-expenses-logic
-Implementar lógica complexa de relatórios de gastos conforme documentação.
+Implementar relatório de gastos do usuário com suas subscriptions.
 
 Tarefas:
-- Escrever testes para endpoint de relatórios de gastos
-- Criar Api/ReportController com método:
-  - GET /api/v1/reports/expenses (relatório de gastos)
-- Implementar filtros avançados:
-  - Por período (mês/ano específico)
-  - Por serviço específico
-  - Por status da subscription (ativa/cancelada)
-- Desenvolver lógica de agrupamento e totalização
-- Criar query otimizada com joins e agregações
-- Retornar dados estruturados conforme documentação
-- Implementar cache para consultas pesadas
-- Validar permissões de acesso aos dados
+- Escrever testes para endpoint de relatório
+- Criar Api/ReportController com método simples:
+  - GET /api/v1/reports/my-expenses (relatório pessoal)
+- Implementar listagem das subscriptions do usuário logado
+- Mostrar dados:
+  - Nome do serviço
+  - Valor mensal da subscription
+  - Status (ativa/cancelada)
+  - Data de início
+- Calcular total simples dos gastos mensais
+- Implementar filtro por status (?status=active|cancelled)
+- Retornar dados em formato JSON estruturado
+- Validar autenticação do usuário
 - Validar testes passando
 
 ### 8. Branch: feat/data-export-functionality
-Implementar exportação de dados em múltiplos formatos conforme documentação.
+Implementar exportação de dados em formato CSV.
 
 Tarefas:
 - Escrever testes para funcionalidade de exportação
-- Instalar Laravel Excel para exportação
 - Criar endpoint:
-  - GET /api/v1/reports/expenses/export (exportação CSV/XLSX)
-- Implementar classe ExpensesExport com formatação adequada
-- Suportar parâmetros de formato (?format=csv ou ?format=xlsx)
-- Aplicar mesmos filtros do relatório de gastos
-- Configurar headers HTTP apropriados para download
-- Implementar logs de auditoria para exportações
-- Validar permissões e rate limiting para downloads
+  - GET /api/v1/reports/my-expenses/export (exportação CSV)
+- Implementar geração de CSV simples usando Response do Laravel
+- Aplicar mesmo filtro do relatório (por status)
+- Configurar headers HTTP para download de arquivo
+- Nomear arquivo com data atual (expenses_2025_01_20.csv)
+- Incluir cabeçalhos das colunas no CSV
+- Validar autenticação do usuário
 - Validar testes passando
 
 ## NIVEL 2 - Documentação

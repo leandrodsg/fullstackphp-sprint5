@@ -17,10 +17,6 @@ class ApiBaseStructureTest extends TestCase
         $user = User::factory()->create();
         Passport::actingAs($user);
 
-        // Este teste verifica se o BaseController está retornando
-        // responses JSON padronizadas
-        
-        // Por enquanto vamos testar uma rota simples que deve existir
         $response = $this->getJson('/api/v1/test-base-response');
 
         $response->assertStatus(200)
@@ -30,30 +26,31 @@ class ApiBaseStructureTest extends TestCase
                 'data'
             ])
             ->assertJson([
-                'success' => true
+                'success' => true,
+                'message' => 'Base response working'
             ]);
     }
 
     /** @test */
     public function api_should_return_standardized_error_response()
     {
-        // Testa se errors são retornados no formato JSON padronizado
-        $response = $this->getJson('/api/v1/non-existent-route');
+        $response = $this->getJson('/api/v1/test-error-response');
 
-        $response->assertStatus(404)
+        $response->assertStatus(400)
             ->assertJsonStructure([
                 'success',
-                'message'
+                'message',
+                'data'
             ])
             ->assertJson([
-                'success' => false
+                'success' => false,
+                'message' => 'Test error message'
             ]);
     }
 
     /** @test */
-    public function api_should_require_authentication_for_protected_routes()
+    public function protected_routes_should_return_401_without_authentication()
     {
-        // Testa se rotas protegidas retornam 401 sem autenticação
         $response = $this->getJson('/api/v1/services');
 
         $response->assertStatus(401)

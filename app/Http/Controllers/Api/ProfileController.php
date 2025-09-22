@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Rules\StrongPassword;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 
@@ -36,7 +37,7 @@ class ProfileController extends Controller
     {
         $data = $request->validate([
             'current_password' => 'required',
-            'new_password' => 'required|min:8|confirmed',
+            'new_password' => ['required', 'confirmed', new StrongPassword()],
         ]);
         $user = $request->user();
         if (!$user || !Hash::check($data['current_password'], $user->password)) {

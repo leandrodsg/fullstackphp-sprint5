@@ -12,28 +12,28 @@ class StrongPassword implements ValidationRule
      */
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
-        if (strlen($value) < 10) {
-            $fail('A senha deve ter pelo menos 10 caracteres.');
+        if (strlen($value) < 12) {
+            $fail('The password must be at least 12 characters long.');
             return;
         }
 
         if (!preg_match('/[a-z]/', $value)) {
-            $fail('A senha deve conter pelo menos uma letra minúscula.');
+            $fail('The password must contain at least one lowercase letter.');
             return;
         }
 
         if (!preg_match('/[A-Z]/', $value)) {
-            $fail('A senha deve conter pelo menos uma letra maiúscula.');
+            $fail('The password must contain at least one uppercase letter.');
             return;
         }
 
         if (!preg_match('/[0-9]/', $value)) {
-            $fail('A senha deve conter pelo menos um número.');
+            $fail('The password must contain at least one number.');
             return;
         }
 
         if (!preg_match('/[!@#$%&*]/', $value)) {
-            $fail('A senha deve conter pelo menos um caractere especial: ! @ # $ % & *');
+            $fail('The password must contain at least one special character: ! @ # $ % & *');
             return;
         }
     }
