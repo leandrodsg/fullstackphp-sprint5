@@ -2,7 +2,9 @@
 
 namespace Tests\Feature;
 
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Hash;
 use Tests\TestCase;
 
 class AuthApiEndpointsTest extends TestCase
@@ -13,10 +15,10 @@ class AuthApiEndpointsTest extends TestCase
     public function register_creates_user_and_returns_token()
     {
         $payload = [
-            'name' => 'Jose Mari',
-            'email' => 'jose@example.com',
-            'password' => 'password123',
-            'password_confirmation' => 'password123'
+            'name' => 'John',
+            'email' => 'john@example.com',
+            'password' => 'StrongPassword123!',
+            'password_confirmation' => 'StrongPassword123!'
         ];
 
         $response = $this->postJson('/api/v1/register', $payload);
@@ -41,16 +43,16 @@ class AuthApiEndpointsTest extends TestCase
         $first = [
             'name' => 'User One',
             'email' => 'dup@example.com',
-            'password' => 'password123',
-            'password_confirmation' => 'password123'
+            'password' => 'StrongPassword123!',
+            'password_confirmation' => 'StrongPassword123!'
         ];
         $this->postJson('/api/v1/register', $first)->assertStatus(201);
 
         $second = [
             'name' => 'User Two',
             'email' => 'dup@example.com',
-            'password' => 'password123',
-            'password_confirmation' => 'password123'
+            'password' => 'StrongPassword123!',
+            'password_confirmation' => 'StrongPassword123!'
         ];
         $this->postJson('/api/v1/register', $second)->assertStatus(422);
     }
@@ -58,16 +60,14 @@ class AuthApiEndpointsTest extends TestCase
     /** @test */
     public function login_returns_token_with_valid_credentials()
     {
-        $this->postJson('/api/v1/register', [
-            'name' => 'Maria',
-            'email' => 'maria@example.com',
-            'password' => 'password123',
-            'password_confirmation' => 'password123'
-        ])->assertStatus(201);
+        $user = User::factory()->create([
+            'email' => 'test@example.com',
+            'password' => Hash::make('StrongPassword123!')
+        ]);
 
         $response = $this->postJson('/api/v1/login', [
-            'email' => 'maria@example.com',
-            'password' => 'password123'
+            'email' => 'test@example.com',
+            'password' => 'StrongPassword123!'
         ]);
 
         $response->assertStatus(200)
@@ -90,13 +90,13 @@ class AuthApiEndpointsTest extends TestCase
         $this->postJson('/api/v1/register', [
             'name' => 'Thiago',
             'email' => 'wronglogin@example.com',
-            'password' => 'password123',
-            'password_confirmation' => 'password123'
+            'password' => 'StrongPassword123!',
+            'password_confirmation' => 'StrongPassword123!'
         ])->assertStatus(201);
 
         $this->postJson('/api/v1/login', [
             'email' => 'wronglogin@example.com',
-            'password' => 'badpass'
+            'password' => 'WrongPassword123!'
         ])->assertStatus(401);
     }
 
@@ -106,8 +106,8 @@ class AuthApiEndpointsTest extends TestCase
         $register = $this->postJson('/api/v1/register', [
             'name' => 'Vini',
             'email' => 'vini@example.com',
-            'password' => 'password123',
-            'password_confirmation' => 'password123'
+            'password' => 'StrongPassword123!',
+            'password_confirmation' => 'StrongPassword123!'
         ])->assertStatus(201);
 
         $token = $register->json('data.token');
@@ -137,30 +137,30 @@ class AuthApiEndpointsTest extends TestCase
     public function change_password_updates_password_and_allows_new_login()
     {
         $register = $this->postJson('/api/v1/register', [
-            'name' => 'Ricardo',
-            'email' => 'ricardo@example.com',
-            'password' => 'password123',
-            'password_confirmation' => 'password123'
+            'name' => 'Carlos',
+            'email' => 'carlos@example.com',
+            'password' => 'StrongPassword123!',
+            'password_confirmation' => 'StrongPassword123!'
         ])->assertStatus(201);
 
         $token = $register->json('data.token');
 
         $this->putJson('/api/v1/change-password', [
-            'current_password' => 'password123',
-            'new_password' => 'newpassword123',
-            'new_password_confirmation' => 'newpassword123'
+            'current_password' => 'StrongPassword123!',
+            'new_password' => 'NewStrongPassword123!',
+            'new_password_confirmation' => 'NewStrongPassword123!'
         ], [ 'Authorization' => 'Bearer ' . $token ])
             ->assertStatus(200)
             ->assertJson(['success' => true]);
 
         $this->postJson('/api/v1/login', [
-            'email' => 'ricardo@example.com',
-            'password' => 'password123'
+            'email' => 'carlos@example.com',
+            'password' => 'StrongPassword123!'
         ])->assertStatus(401);
 
         $this->postJson('/api/v1/login', [
-            'email' => 'ricardo@example.com',
-            'password' => 'newpassword123'
+            'email' => 'carlos@example.com',
+            'password' => 'NewStrongPassword123!'
         ])->assertStatus(200);
     }
 
@@ -170,15 +170,15 @@ class AuthApiEndpointsTest extends TestCase
         $register = $this->postJson('/api/v1/register', [
             'name' => 'Nina',
             'email' => 'nina@example.com',
-            'password' => 'password123',
-            'password_confirmation' => 'password123'
+            'password' => 'StrongPassword123!',
+            'password_confirmation' => 'StrongPassword123!'
         ])->assertStatus(201);
         $token = $register->json('data.token');
 
         $this->putJson('/api/v1/change-password', [
             'current_password' => 'WRONG',
-            'new_password' => 'newpassword123',
-            'new_password_confirmation' => 'newpassword123'
+            'new_password' => 'NewStrongPassword123!',
+            'new_password_confirmation' => 'NewStrongPassword123!'
         ], [ 'Authorization' => 'Bearer ' . $token ])
             ->assertStatus(400);
     }
