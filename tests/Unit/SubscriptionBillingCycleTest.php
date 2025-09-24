@@ -25,7 +25,7 @@ class SubscriptionBillingCycleTest extends TestCase
         $subscription = Subscription::create([
             'user_id' => $user->id,
             'service_id' => $service->id,
-            'plan' => 'Basic', // Monthly plan
+            'plan' => 'Basic',
             'price' => 9.99,
             'currency' => 'USD',
             'next_billing_date' => now()->format('Y-m-d'),
@@ -38,7 +38,6 @@ class SubscriptionBillingCycleTest extends TestCase
         
         $subscription->refresh();
         
-        // Should advance by 1 month for monthly plans
         $expectedDate = $originalDate->addMonth()->format('Y-m-d');
         $this->assertEquals($expectedDate, $subscription->next_billing_date->format('Y-m-d'));
         
@@ -56,7 +55,7 @@ class SubscriptionBillingCycleTest extends TestCase
         $subscription = Subscription::create([
             'user_id' => $user->id,
             'service_id' => $service->id,
-            'plan' => 'Premium Annual', // Annual plan
+            'plan' => 'Premium Annual',
             'price' => 99.99,
             'currency' => 'USD',
             'next_billing_date' => now()->format('Y-m-d'),
@@ -69,7 +68,6 @@ class SubscriptionBillingCycleTest extends TestCase
         
         $subscription->refresh();
         
-        // Should advance by 1 year for annual plans
         $expectedDate = $originalDate->addYear()->format('Y-m-d');
         $this->assertEquals($expectedDate, $subscription->next_billing_date->format('Y-m-d'));
         
@@ -87,7 +85,7 @@ class SubscriptionBillingCycleTest extends TestCase
         $subscription = Subscription::create([
             'user_id' => $user->id,
             'service_id' => $service->id,
-            'plan' => 'Enterprise Yearly', // Yearly plan
+            'plan' => 'Enterprise Yearly',
             'price' => 199.99,
             'currency' => 'USD',
             'next_billing_date' => now()->format('Y-m-d'),
@@ -100,7 +98,6 @@ class SubscriptionBillingCycleTest extends TestCase
         
         $subscription->refresh();
         
-        // Should advance by 1 year for yearly plans
         $expectedDate = $originalDate->addYear()->format('Y-m-d');
         $this->assertEquals($expectedDate, $subscription->next_billing_date->format('Y-m-d'));
         
@@ -139,12 +136,11 @@ class SubscriptionBillingCycleTest extends TestCase
             $subscription->advanceOneCycle();
             $subscription->refresh();
             
-            // All should advance by 1 year regardless of case
             $expectedDate = $originalDate->addYear()->format('Y-m-d');
             $this->assertEquals($expectedDate, $subscription->next_billing_date->format('Y-m-d'), 
                 "Failed for plan: {$planName}");
             
-            $subscription->delete(); // Clean up for next iteration
+            $subscription->delete();
         }
     }
 
@@ -162,7 +158,7 @@ class SubscriptionBillingCycleTest extends TestCase
             'Pro',
             'Enterprise',
             'Starter',
-            'Advanced Monthly', // Has "monthly" but not "annual"/"yearly"
+            'Advanced Monthly',
             'Custom Plan'
         ];
 
@@ -182,12 +178,11 @@ class SubscriptionBillingCycleTest extends TestCase
             $subscription->advanceOneCycle();
             $subscription->refresh();
             
-            // All should default to 1 month
             $expectedDate = $originalDate->addMonth()->format('Y-m-d');
             $this->assertEquals($expectedDate, $subscription->next_billing_date->format('Y-m-d'), 
                 "Failed for plan: {$planName}");
             
-            $subscription->delete(); // Clean up for next iteration
+            $subscription->delete();
         }
     }
 
@@ -200,7 +195,7 @@ class SubscriptionBillingCycleTest extends TestCase
         $subscription = Subscription::create([
             'user_id' => $user->id,
             'service_id' => $service->id,
-            'plan' => 'Premium Annual', // Annual, but advanceBillingDate always adds 1 month
+            'plan' => 'Premium Annual',
             'price' => 99.99,
             'currency' => 'USD',
             'next_billing_date' => now()->format('Y-m-d'),
@@ -213,7 +208,6 @@ class SubscriptionBillingCycleTest extends TestCase
         
         $subscription->refresh();
         
-        // advanceBillingDate should ALWAYS add 1 month (backward compatibility)
         $expectedDate = $originalDate->addMonth()->format('Y-m-d');
         $this->assertEquals($expectedDate, $subscription->next_billing_date->format('Y-m-d'));
     }
