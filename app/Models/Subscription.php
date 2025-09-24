@@ -67,11 +67,9 @@ class Subscription extends Model
      */
     public function advanceOneCycle(): void
     {
-        // Detect if plan is annual or monthly
         if (stripos($this->plan, 'annual') !== false || stripos($this->plan, 'yearly') !== false) {
             $this->update(['next_billing_date' => $this->next_billing_date->addYear()]);
         } else {
-            // Default to monthly for all other plans
             $this->advanceBillingDate();
         }
         
