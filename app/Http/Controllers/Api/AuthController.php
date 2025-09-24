@@ -31,7 +31,6 @@ class AuthController extends Controller
         if (DB::table('oauth_personal_access_clients')->count() > 0) {
             return;
         }
-        // Create via Eloquent to apply casts
         /** @var Client $client */
         $client = Client::create([
             'name' => 'Personal Access Client',

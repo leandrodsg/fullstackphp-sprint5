@@ -14,12 +14,10 @@ class ServiceController extends BaseController
     {
         $query = Service::forUser();
         
-        // Filter by name
         if ($request->has('name')) {
             $query->where('name', 'like', '%' . $request->name . '%');
         }
         
-        // Filter by category
         if ($request->has('category')) {
             $query->where('category', $request->category);
         }

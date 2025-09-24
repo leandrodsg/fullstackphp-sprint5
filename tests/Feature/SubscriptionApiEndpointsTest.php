@@ -295,7 +295,6 @@ class SubscriptionApiEndpointsTest extends TestCase
     {
         $subscription = Subscription::factory()->create();
 
-        // Test all endpoints without authentication
         $this->getJson('/api/v1/subscriptions')->assertStatus(401);
         $this->postJson('/api/v1/subscriptions', [])->assertStatus(401);
         $this->getJson("/api/v1/subscriptions/{$subscription->id}")->assertStatus(401);

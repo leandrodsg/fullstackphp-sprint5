@@ -20,12 +20,10 @@ class DomainModelMethodsTest extends TestCase
         $service1 = Service::factory()->create(['user_id' => $user1->id, 'name' => 'User1 Service']);
         $service2 = Service::factory()->create(['user_id' => $user2->id, 'name' => 'User2 Service']);
 
-        // Test scope filters correctly
         $user1Services = Service::forUser($user1->id)->get();
         $this->assertCount(1, $user1Services);
         $this->assertEquals('User1 Service', $user1Services->first()->name);
 
-        // Test with authenticated user
         $this->actingAs($user2);
         $user2Services = Service::forUser()->get();
         $this->assertCount(1, $user2Services);
@@ -60,12 +58,10 @@ class DomainModelMethodsTest extends TestCase
             'status' => 'active'
         ]);
 
-        // Test scope filters correctly
         $user1Subscriptions = Subscription::forUser($user1->id)->get();
         $this->assertCount(1, $user1Subscriptions);
         $this->assertEquals('Basic', $user1Subscriptions->first()->plan);
 
-        // Test with authenticated user
         $this->actingAs($user2);
         $user2Subscriptions = Subscription::forUser()->get();
         $this->assertCount(1, $user2Subscriptions);
@@ -77,7 +73,6 @@ class DomainModelMethodsTest extends TestCase
         $user = User::factory()->create();
         $service = Service::factory()->create(['user_id' => $user->id]);
 
-        // Create subscription due yesterday
         $dueSubscription = Subscription::create([
             'user_id' => $user->id,
             'service_id' => $service->id,
@@ -88,7 +83,6 @@ class DomainModelMethodsTest extends TestCase
             'status' => 'active'
         ]);
 
-        // Create subscription due next month
         $notDueSubscription = Subscription::create([
             'user_id' => $user->id,
             'service_id' => $service->id,
