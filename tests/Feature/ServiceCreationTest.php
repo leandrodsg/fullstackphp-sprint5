@@ -75,14 +75,13 @@ class ServiceCreationTest extends TestCase
     {
         $user = User::factory()->create();
         
-        // Create first service
         Service::factory()->create([
             'name' => 'Netflix',
             'user_id' => $user->id
         ]);
 
         $duplicateNameData = [
-            'name' => 'Netflix', // Same name
+            'name' => 'Netflix',
             'category' => 'Streaming',
             'description' => 'Another Netflix service'
         ];
@@ -106,19 +105,16 @@ class ServiceCreationTest extends TestCase
             'description' => 'Video streaming service'
         ];
 
-        // User 1 creates service
         $this->actingAs($user1)
             ->post('/services', $serviceData)
             ->assertRedirect('/services');
 
-        // User 2 creates service with same name (should work)
         $this->actingAs($user2)
             ->post('/services', $serviceData)
             ->assertRedirect('/services');
 
         $this->assertDatabaseCount('services', 2);
         
-        // Verify both services exist with correct user_id
         $this->assertDatabaseHas('services', [
             'name' => 'Netflix',
             'user_id' => $user1->id
