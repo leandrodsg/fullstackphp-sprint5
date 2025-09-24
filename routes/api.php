@@ -20,12 +20,10 @@ use App\Http\Controllers\Api\ReportController;
 */
 
 Route::prefix('v1')->group(function () {
-    // Test route
     Route::get('/test', function () {
         return response()->json(['message' => 'API is working!']);
     });
     
-    // Test route for base structure
     Route::get('/test-base-response', function () {
         return response()->json([
             'success' => true,
@@ -34,7 +32,6 @@ Route::prefix('v1')->group(function () {
         ]);
     });
     
-    // Test route for error response
     Route::get('/test-error-response', function () {
         return response()->json([
             'success' => false,
@@ -49,7 +46,6 @@ Route::prefix('v1')->group(function () {
 
     // Protected routes
     Route::middleware('auth:api')->group(function () {
-        // Profile routes
         Route::get('/profile', [AuthController::class, 'profile']);
         Route::get('/user', [AuthController::class, 'profile']); // Alias para compatibilidade com testes
         Route::put('/change-password', [AuthController::class, 'changePassword']);
@@ -77,6 +73,7 @@ Route::prefix('v1')->group(function () {
 
         // Reports routes
         Route::get('/reports/my-expenses', [ReportController::class, 'myExpenses']);
+        Route::get('/reports/my-expenses/export', [ReportController::class, 'exportMyExpenses']);
     });
 });
 
