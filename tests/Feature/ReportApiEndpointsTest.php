@@ -28,7 +28,6 @@ class ReportApiEndpointsTest extends TestCase
     {
         Passport::actingAs($this->user);
         
-        // Create test subscriptions
         Subscription::factory()->create([
             'user_id' => $this->user->id,
             'service_id' => $this->service->id,
@@ -82,7 +81,6 @@ class ReportApiEndpointsTest extends TestCase
     {
         Passport::actingAs($this->user);
         
-        // Create test subscriptions
         Subscription::factory()->create([
             'user_id' => $this->user->id,
             'service_id' => $this->service->id,
@@ -110,6 +108,107 @@ class ReportApiEndpointsTest extends TestCase
     }
 
     /** @test */
+    public function authenticated_user_can_export_expense_report_as_csv()
+    {
+        Passport::actingAs($this->user);
+        
+        Subscription::factory()->create([
+            'user_id' => $this->user->id,
+            'service_id' => $this->service->id,
+            'price' => 10.99,
+            'status' => 'active'
+        ]);
+        
+        Subscription::factory()->create([
+            'user_id' => $this->user->id,
+            'service_id' => $this->service->id,
+            'price' => 5.99,
+            'status' => 'cancelled'
+        ]);
+
+        $response = $this->getJson('/api/v1/reports/my-expenses/export');
+
+        $response->assertStatus(200)
+            ->assertHeader('Content-Type', 'text/csv; charset=UTF-8')
+            ->assertHeader('Content-Disposition');
+        
+        $content = $response->getContent();
+        $this->assertStringContainsString('Service Name,Plan,Price,Currency,Status,Next Billing Date', $content);
+        $this->assertStringContainsString($this->service->name, $content);
+        $this->assertStringContainsString('10.99', $content);
+        $this->assertStringContainsString('5.99', $content);
+    }
+
+    /** @test */
+    public function authenticated_user_can_export_filtered_expense_report_as_csv()
+    {
+        Passport::actingAs($this->user);
+        
+        Subscription::factory()->create([
+            'user_id' => $this->user->id,
+            'service_id' => $this->service->id,
+            'price' => 10.99,
+            'status' => 'active'
+        ]);
+        
+        Subscription::factory()->create([
+            'user_id' => $this->user->id,
+            'service_id' => $this->service->id,
+            'price' => 5.99,
+            'status' => 'cancelled'
+        ]);
+
+        $response = $this->getJson('/api/v1/reports/my-expenses/export?status=active');
+
+        $response->assertStatus(200)
+            ->assertHeader('Content-Type', 'text/csv; charset=UTF-8');
+        
+        $content = $response->getContent();
+        
+        $this->assertStringContainsString('10.99', $content);
+        $this->assertStringContainsString('active', $content);
+        $this->assertStringNotContainsString('5.99', $content);
+        $this->assertStringNotContainsString('cancelled', $content);
+    }
+
+    /** @test */
+    public function unauthenticated_user_cannot_export_expense_report()
+    {
+        $response = $this->getJson('/api/v1/reports/my-expenses/export');
+
+        $response->assertStatus(401);
+    }
+
+    /** @test */
+    public function user_only_exports_their_own_subscriptions_in_csv()
+    {
+        Passport::actingAs($this->user);
+        
+        Subscription::factory()->create([
+            'user_id' => $this->user->id,
+            'service_id' => $this->service->id,
+            'price' => 10.99
+        ]);
+        
+        $otherUser = User::factory()->create();
+        $otherService = Service::factory()->create(['user_id' => $otherUser->id]);
+        Subscription::factory()->create([
+            'user_id' => $otherUser->id,
+            'service_id' => $otherService->id,
+            'price' => 20.99
+        ]);
+
+        $response = $this->getJson('/api/v1/reports/my-expenses/export');
+
+        $response->assertStatus(200);
+        
+        $content = $response->getContent();
+        
+        $this->assertStringContainsString('10.99', $content);
+        $this->assertStringNotContainsString('20.99', $content);
+    }
+
+    /** @test */
     public function unauthenticated_user_cannot_access_expense_report()
     {
         $response = $this->getJson('/api/v1/reports/my-expenses');
@@ -122,14 +221,12 @@ class ReportApiEndpointsTest extends TestCase
     {
         Passport::actingAs($this->user);
         
-        // Create subscription for current user
         Subscription::factory()->create([
             'user_id' => $this->user->id,
             'service_id' => $this->service->id,
             'price' => 10.99
         ]);
         
-        // Create subscription for another user
         $otherUser = User::factory()->create();
         $otherService = Service::factory()->create(['user_id' => $otherUser->id]);
         Subscription::factory()->create([
