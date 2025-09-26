@@ -1,29 +1,29 @@
 # Branch: feat/email-verification
 
-## Objetivo
-Ativar infraestrutura de verificação de e-mail sem alterar drasticamente UX.
+## Objective
+Enable email verification infrastructure without drastically changing the user experience.
 
-## O que foi implementado
-- Ativado MustVerifyEmail no model User:
-  - Interface implementada para habilitar verificação de email
-  
-- Rotas já existentes (Laravel Breeze):
-  - /verify-email - prompt de verificação
-  - /email/verification-notification - reenvio de email
-  - Controllers e middleware já configurados
+## What was implemented
+- Enabled MustVerifyEmail on the User model:
+  - Interface implemented to enable email verification
 
-## Como funciona
-1. Cadastro atual continua igual - usuário entra direto
-2. Email de verificação é enviado automaticamente após cadastro
-3. Verificação opcional - usuário pode clicar no link quando quiser
-4. Preparado para API - middleware verified disponível para futuras rotas
+- Existing routes (Laravel Breeze):
+  - /verify-email - verification prompt
+  - /email/verification-notification - resend email
+  - Controllers and middleware already configured
 
-## Como testar localmente
-1. Configure MAIL_MAILER=log no .env (já configurado)
-2. Cadastre um novo usuário
-3. Verifique o email no arquivo storage/logs/laravel.log
-4. Acesse o link para verificar o email
+## How it works
+1. Registration flow remains the same - user logs in directly
+2. Verification email is sent automatically after registration
+3. Verification is optional - user can click the link whenever they want
+4. Ready for API - verified middleware available for future routes
 
-## Configuração atual
-- Emails salvos em log (MAIL_MAILER=log)
-- Remetente configurado (noreply@techsubs.com)
+## How to test locally
+1. Set MAIL_MAILER=log in .env (already configured)
+2. Register a new user
+3. Check the email in storage/logs/laravel.log
+4. Access the link to verify the email
+
+## Current configuration
+- Emails saved in log (MAIL_MAILER=log)
+- Sender configured (noreply@techsubs.com)

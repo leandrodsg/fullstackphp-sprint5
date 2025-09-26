@@ -1,44 +1,44 @@
 # Branch: refactor/domain-model-methods
 
-## Objetivo
-Encapsular lógica de domínio nos models para reduzir repetição de código e criar uma base mais consistente para futura migração para API.
+## Objective
+Encapsulate domain logic in the models to reduce code repetition and create a more consistent base for future API migration.
 
-## Alterações Realizadas
+## Changes Made
 
-### 1. Model Service (`app/Models/Service.php`)
-- Adicionado: `scopeForUser()` - scope para filtrar services pelo usuário logado ou específico
-- Elimina repetição de `where('user_id', Auth::id())` nos controllers
+### 1. Service Model (`app/Models/Service.php`)
+- Added: `scopeForUser()` – scope to filter services by the logged-in or specific user
+- Eliminates repetition of `where('user_id', Auth::id())` in controllers
 
-### 2. Model Subscription (`app/Models/Subscription.php`)
-- Adicionado: `scopeForUser()` - scope para filtrar subscriptions pelo usuário logado ou específico
-- Adicionado: `isDue()` - método para verificar se a subscription está vencida (past billing date)
-- Adicionado: `advanceBillingDate()` - método para avançar a data de cobrança em um mês
-- Encapsula lógica de domínio no model, preparando para automações futuras
+### 2. Subscription Model (`app/Models/Subscription.php`)
+- Added: `scopeForUser()` – scope to filter subscriptions by the logged-in or specific user
+- Added: `isDue()` – method to check if the subscription is overdue (past billing date)
+- Added: `advanceBillingDate()` – method to advance the billing date by one month
+- Encapsulates domain logic in the model, preparing for future automations
 
 ### 3. ServiceController (`app/Http/Controllers/ServiceController.php`)
-- Refatorado: Todos os métodos agora usam `Service::forUser()` em vez de `where('user_id', Auth::id())`
-- Métodos alterados: `index()`, `show()`, `edit()`, `update()`, `destroy()`
-- Código mais limpo e menos repetitivo
+- Refactored: All methods now use `Service::forUser()` instead of `where('user_id', Auth::id())`
+- Methods changed: `index()`, `show()`, `edit()`, `update()`, `destroy()`
+- Cleaner and less repetitive code
 
 ### 4. SubscriptionController (`app/Http/Controllers/SubscriptionController.php`)
-- Refatorado: Todos os métodos agora usam `Subscription::forUser()` em vez de `where('user_id', Auth::id())`
-- Refatorado: Métodos `create()` e `edit()` agora mostram apenas services do usuário logado
-- Métodos alterados: `index()`, `create()`, `show()`, `edit()`, `update()`, `destroy()`
-- Código mais limpo e seguro (usuário só vê seus próprios services)
+- Refactored: All methods now use `Subscription::forUser()` instead of `where('user_id', Auth::id())`
+- Refactored: `create()` and `edit()` methods now show only services of the logged-in user
+- Methods changed: `index()`, `create()`, `show()`, `edit()`, `update()`, `destroy()`
+- Cleaner and safer code (user only sees their own services)
 
-### 5. Testes (`tests/Feature/DomainModelMethodsTest.php`)
-- Criado: Testes para validar funcionamento dos scopes e métodos de domínio
-- Cobertura: `scopeForUser` nos dois models, `isDue()` e `advanceBillingDate()`
-- Garantia de que refatoração não quebra funcionalidades
+### 5. Tests (`tests/Feature/DomainModelMethodsTest.php`)
+- Created: Tests to validate the functioning of scopes and domain methods
+- Coverage: `scopeForUser` in both models, `isDue()` and `advanceBillingDate()`
+- Ensures that the refactor does not break functionalities
 
-## Arquivos Modificados
+## Modified Files
 - `app/Models/Service.php`
 - `app/Models/Subscription.php`
 - `app/Http/Controllers/ServiceController.php`
 - `app/Http/Controllers/SubscriptionController.php`
-- `tests/Feature/DomainModelMethodsTest.php` (novo)
+- `tests/Feature/DomainModelMethodsTest.php` (new)
 
-## Como Testar
+## How to Test
 ```bash
-# Executar testes específicos da branch
 php artisan test tests/Feature/DomainModelMethodsTest.php
+```
