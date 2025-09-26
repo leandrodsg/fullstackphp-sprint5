@@ -194,10 +194,7 @@ Technical details:
 More details: [README_feat_data_export_functionality.md](../Sprint%205/development/README_feat_data_export_functionality.md)
 
 ### LEVEL 2 (API Documentation)
-Additional branch:
-## 9. Branch docs/api-documentation
+- 9. Branch docs/api-documentation
 
 ### LEVEL 3 (Deployment)
-Additional branch:
-## 10. Branch deploy/production-setup
-
+- 10. Branch deploy/production-setup

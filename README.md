@@ -28,7 +28,7 @@ Implementation details:
 - [docs/Sprint 5/README_implementation.md](docs/Sprint%205/README_implementation.md) 
 
 API endpoints documentation:
-- [docs/Sprint 5/endpoints/README.md](docs/Sprint%205/endpoints/README.md) 
+- [docs/Sprint 5/endpoints/ENDPOINTS_API.md](docs/Sprint%205/endpoints/ENDPOINTS_API.md) 
 
 The `docs/` folder contains additional documentation for each feature, API endpoint, and development process.
 
