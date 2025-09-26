@@ -187,7 +187,6 @@ Tarefas:
 - Adicionar exemplos de filtros e paginação
 - Incluir instruções de instalação e configuração
 - Criar collection do Postman/Insomnia para testes
-- Documentar rate limiting e políticas de uso
 
 ## NIVEL 3 - Deploy
 

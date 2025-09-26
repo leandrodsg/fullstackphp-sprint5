@@ -1,37 +1,37 @@
 # Branch: chore/api-resources-stubs
 
-## Objetivo
-Criar API Resources básicos para preparar a futura migração para API REST no Sprint 5.
+## Objective
+Create basic API Resources to prepare for the future migration to API REST in Sprint 5.
 
-## Alterações Realizadas
+## Changes Made
 
 ### 1. ServiceResource (`app/Http/Resources/ServiceResource.php`)
-- Resource para serializar dados do model Service
-- Campos: id, name, category, description, website_url, created_at, updated_at
-- Padroniza formato de retorno para APIs futuras
+- Resource to serialize data from the Service model
+- Fields: id, name, category, description, website_url, created_at, updated_at
+- Standardizes response format for future APIs
 
-### 2. SubscriptionResource (`app/Http/Resources/SubscriptionResource.php`) 
-- Resource para serializar dados do model Subscription
-- Campos: id, plan, price, currency, status, next_billing_date, created_at, updated_at
-- Controla quais dados da subscription são expostos via API
+### 2. SubscriptionResource (`app/Http/Resources/SubscriptionResource.php`)
+- Resource to serialize data from the Subscription model
+- Fields: id, plan, price, currency, status, next_billing_date, created_at, updated_at
+- Controls which subscription data is exposed via API
 
 ### 3. UserResource (`app/Http/Resources/UserResource.php`)
-- Resource para serializar dados do model User
-- Campos: id, name, email, email_verified_at, created_at, updated_at
-- Garante que dados sensíveis (password, tokens) não sejam expostos
+- Resource to serialize data from the User model
+- Fields: id, name, email, email_verified_at, created_at, updated_at
+- Ensures sensitive data (password, tokens) is not exposed
 
-### 4. Testes (`tests/Feature/ApiResourcesTest.php`)
-- Testes para validar estrutura dos Resources
-- Cobertura: Campos obrigatórios, segurança (dados não expostos)
-- Garantia de que serialização funciona corretamente
+### 4. Tests (`tests/Feature/ApiResourcesTest.php`)
+- Tests to validate the structure of the Resources
+- Coverage: Required fields, security (data not exposed)
+- Ensures serialization works correctly
 
-## Arquivos Modificados
-- `app/Http/Resources/ServiceResource.php` (novo)
-- `app/Http/Resources/SubscriptionResource.php` (novo)
-- `app/Http/Resources/UserResource.php` (novo)
-- `tests/Feature/ApiResourcesTest.php` (novo)
+## Modified Files
+- `app/Http/Resources/ServiceResource.php` (new)
+- `app/Http/Resources/SubscriptionResource.php` (new)
+- `app/Http/Resources/UserResource.php` (new)
+- `tests/Feature/ApiResourcesTest.php` (new)
 
-## Como Testar
+## How to Test
 ```bash
-# Executar testes específicos da branch
 php artisan test tests/Feature/ApiResourcesTest.php
+```

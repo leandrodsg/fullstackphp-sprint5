@@ -1,25 +1,25 @@
 # Branch: feat/password-policy
 
-## Objetivo
-Reforçar a segurança de senha no cadastro de usuários, conforme feedback do professor, exigindo critérios mínimos claros e didáticos.
+## Objective
+Strengthen password security during user registration, following the professor's feedback, by requiring clear and didactic minimum criteria.
 
-## O que foi implementado
-- Regra customizada de senha forte (`app/Rules/StrongPassword.php`):
-  - Mínimo de 10 caracteres
-  - Pelo menos uma letra maiúscula
-  - Pelo menos uma letra minúscula
-  - Pelo menos um número
-  - Pelo menos um caractere especial (!@#$%&*)
-- Integração da regra na validação de registro de usuários (`RegisterUserRequest`).
-- Mensagens de erro claras e didáticas para cada critério.
-- Testes automatizados:
-  - Testes unitários para cada critério da regra
-  - Teste de integração no fluxo de registro
+## What was implemented
+- Custom strong password rule (`app/Rules/StrongPassword.php`):
+  - Minimum of 12 characters
+  - At least one uppercase letter
+  - At least one lowercase letter
+  - At least one number
+  - At least one special character (!@#$%&*)
+- Integration of the rule in user registration validation (`RegisterUserRequest`).
+- Clear and didactic error messages for each criterion.
+- Automated tests:
+  - Unit tests for each rule criterion
+  - Integration test in the registration flow
 
-## Como testar
-1. Rode os testes da feature:
+## How to test
+1. Run the feature tests:
    ```bash
    php artisan test --filter=StrongPasswordTest
    ```
-2. Tente registrar um usuário com senha fraca e veja a mensagem de erro.
-3. Tente registrar com senha forte e confirme o sucesso.
+2. Try to register a user with a weak password and check the error message.
+3. Try to register with a strong password and confirm success.

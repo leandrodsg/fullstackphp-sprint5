@@ -1,5 +1,5 @@
 
-# Documentación de Endpoints de la API – TechSubs
+// Historical file: this is the original API documentation approved before project development. See README.md in this folder for the current API documentation.
 
 ## Introducción
 
