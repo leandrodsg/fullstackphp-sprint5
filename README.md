@@ -1,19 +1,36 @@
 # TechSubs - Digital Subscription Management System
 
-TechSubs is a comprehensive web application built with Laravel 12 for managing digital service subscriptions.
+TechSubs is a web application built with Laravel 12 for managing digital service subscriptions, now evolved to a full-featured REST API and modern frontend in Sprint 5.
 
-## Project Overview
+## Project Overview (Sprint 5)
 
-This application enables users to manage their digital subscriptions for services like Netflix, Spotify, GitHub, AWS, and other online platforms.
+TechSubs enables users to manage their digital subscriptions for services like Netflix, Spotify, GitHub, AWS, and more. In Sprint 5, the project was refactored and expanded to support a scalable API-first architecture, advanced authentication, role-based access, and comprehensive reporting and export features.
 
-### Key Features
+### Key Features (Sprint 5)
 
-- User Authentication: Complete registration and login system with email verification
-- Subscription Management: Full CRUD operations for services and subscriptions
-- Billing Cycles: Support for monthly and annual billing periods
-- User Data Isolation: Each user can only access their own data
-- Form Validation: Validation using Laravel Form Requests
-- Event System: Automated logging and business logic through events and listeners
+- OAuth2 API Authentication with Laravel Passport
+- Role-based access control (user/admin) with comprehensive policies
+- Full REST API for services and subscriptions management
+- Monthly and annual billing cycle management with automated advancement
+- User data isolation and security at all API layers
+- Form Request validation with strong password policies and business rules
+- Event-driven architecture for billing notifications and audit logging
+- Expense reporting and CSV export endpoints with filtering capabilities
+- Comprehensive test coverage for all API endpoints and business logic
+- API Resources for consistent JSON response formatting
+- Modern web interface with Blade templates and Tailwind CSS (secondary to API)
+
+## Documentation and Implementation Details
+
+This README provides a high-level overview of the system and installation. For a detailed technical breakdown of the implementation, including branch-by-branch decisions, improvements, and architectural changes, see:
+
+Implementation details:
+- [docs/Sprint 5/README_implementation.md](docs/Sprint%205/README_implementation.md) 
+
+API endpoints documentation:
+- [docs/Sprint 5/endpoints/README.md](docs/Sprint%205/endpoints/README.md) 
+
+The `docs/` folder contains additional documentation for each feature, API endpoint, and development process.
 
 ## Installation Instructions
 
@@ -38,8 +55,8 @@ Before installing TechSubs, ensure your development environment meets these requ
 
 1. **Clone the Repository**
    ```bash
-   git clone https://github.com/leandrodsg/fullstackphp-sprint4.git
-   cd fullstackphp-sprint4/TechSubs
+   git clone https://github.com/leandrodsg/fullstackphp-sprint5.git
+   cd fullstackphp-sprint5/TechSubs_API
    ```
 
 2. **Install PHP Dependencies**
@@ -81,19 +98,120 @@ Before installing TechSubs, ensure your development environment meets these requ
    php artisan migrate
    ```
 
-7. **Seed Database (Optional)**
+7. **Seed Database (Recommended)**
    ```bash
    php artisan db:seed
    ```
 
-8. **Start Development Server**
+8. **Install Passport and Generate Keys**
+   ```bash
+   php artisan passport:install
+   ```
+
+9. **Start Development Server**
    ```bash
    php artisan serve
    ```
 
 The application will be available at `http://localhost:8000`
 
-## System Architecture
+## Quick Start
+
+After installation, test the API functionality with these commands:
+
+### Register a new user
+```bash
+curl -X POST http://localhost:8000/api/v1/register \
+-H "Content-Type: application/json" \
+-d "{\"name\":\"Test User\",\"email\":\"test@test.com\",\"password\":\"TestPassword@123\",\"password_confirmation\":\"TestPassword@123\"}"
+```
+
+### Login and obtain access token
+```bash
+curl -X POST http://localhost:8000/api/v1/login \
+-H "Content-Type: application/json" \
+-d "{\"email\":\"test@test.com\",\"password\":\"TestPassword@123\"}"
+```
+
+Copy the `access_token` from the response for subsequent requests.
+
+### Create a service using the token
+```bash
+curl -X POST http://localhost:8000/api/v1/services \
+-H "Authorization: Bearer YOUR_TOKEN_HERE" \
+-H "Content-Type: application/json" \
+-d "{\"name\":\"Netflix\",\"category\":\"Streaming\",\"price\":15.99,\"billing_cycle\":\"monthly\"}"
+```
+
+### List user services
+```bash
+curl -X GET http://localhost:8000/api/v1/services \
+-H "Authorization: Bearer YOUR_TOKEN_HERE"
+```
+
+## Troubleshooting
+
+### Internal Server Error (500)
+```bash
+php artisan key:generate
+php artisan config:clear
+php artisan cache:clear
+```
+
+### Passport authentication issues
+```bash
+php artisan passport:install --force
+php artisan passport:keys --force
+```
+
+### Database connection problems
+1. Ensure `.env` file exists (copy from `.env.example`)
+2. For SQLite: verify `database/database.sqlite` file exists
+3. For MySQL: check database credentials in `.env`
+
+### Permission errors (Windows/XAMPP)
+```bash
+chmod -R 775 storage bootstrap/cache
+```
+
+### Migration failures
+```bash
+php artisan migrate:fresh --seed
+```
+
+## Testing Data
+
+### Test user accounts
+- Email: `admin@example.com` | Password: `AdminPassword@123` (role: admin)
+- Email: `user@example.com` | Password: `UserPassword@123` (role: user)
+
+### Service categories
+- Streaming (Netflix, Spotify, YouTube Premium)
+- Cloud Storage (Google Drive, Dropbox, OneDrive)
+- Productivity (Office 365, Adobe Creative, Notion)
+- Development (GitHub Pro, Heroku, AWS)
+
+### Example service data
+```json
+{
+  "name": "Netflix",
+  "category": "Streaming",
+  "price": 15.99,
+  "billing_cycle": "monthly"
+}
+```
+
+```json
+{
+  "name": "Adobe Creative Cloud",
+  "category": "Productivity", 
+  "price": 239.88,
+  "billing_cycle": "annual"
+}
+```
+
+
+## System Architecture and Features
 
 ### Database Schema
 
@@ -123,10 +241,8 @@ The application uses three core entities:
 
 ### Model Architecture
 
-Data modeling and business logic:
-
 **User Model**
-- Implements Laravel Breeze authentication with email verification
+- Implements OAuth2 authentication with Laravel Passport for API access
 - Enforces strong password policies and security validations
 - Defines relationships with services and subscriptions
 - Includes user data isolation methods
@@ -152,8 +268,6 @@ Data modeling and business logic:
 
 ### Controller and Validation Implementation
 
-The application implements clean controller architecture with proper separation of concerns:
-
 **Controller Structure**
 - Resource controllers for standard CRUD operations (ServiceController, SubscriptionController)
 - Controllers handle HTTP logic while delegating business operations to models
@@ -168,9 +282,26 @@ The application implements clean controller architecture with proper separation 
 - Business rule enforcement including minimum pricing and category constraints
 - Security validations preventing cross-user data access attempts
 
-### Frontend Architecture and User Experience
+### API-First Design
 
-The application provides a modern, responsive interface built with Laravel Blade and Tailwind CSS:
+- All core features are exposed via RESTful API endpoints (see docs for details)
+- OAuth2 authentication and role-based access for secure API usage
+- Standardized JSON responses and error handling
+
+#### Example Endpoints
+
+- `POST /api/v1/register` — User registration
+- `POST /api/v1/login` — User login
+- `GET /api/v1/services` — List user services
+- `POST /api/v1/services` — Create new service
+- `GET /api/v1/subscriptions` — List user subscriptions
+- `POST /api/v1/subscriptions` — Create new subscription
+- `GET /api/v1/reports/my-expenses` — Expense report
+- `GET /api/v1/reports/my-expenses/export` — Export expenses as CSV
+
+See the `docs/` folder for full API documentation and request/response examples.
+
+### Frontend Architecture and User Experience
 
 **Template System**
 - Master layout ensuring consistent navigation and authentication states
@@ -188,29 +319,29 @@ The application provides a modern, responsive interface built with Laravel Blade
 
 ### Security and Authentication System
 
-The application implements comprehensive security measures across all layers:
+OAuth2 Authentication with Laravel Passport
+- Personal Access Tokens for API authentication
+- Token-based authentication for all API endpoints
+- Secure token management with automatic expiration
+- Client credentials for machine-to-machine communication
 
-**Authentication Infrastructure**
-- Laravel Breeze providing secure authentication foundation
-- Email verification system preventing unauthorized account creation
+Role-Based Access Control
+- User roles: `user` and `admin` with distinct permissions
+- Policy-based authorization for all resources
+- Resource ownership validation ensuring users can only access their own data
+- Admin privileges for system-wide operations and reporting
+
+API Security Features
+- Request validation through Form Request classes
 - Strong password policies with custom validation rules
-- Secure password reset functionality using time-limited tokens
-- Route protection via middleware ensuring authenticated access
-
-**Security Implementation**
-- Multi-level user data isolation (database, model, and controller layers)
-- CSRF protection on all form submissions
-- Mass assignment protection in all Eloquent models
-- Comprehensive input validation and sanitization
-- Security by obscurity approach (404 responses instead of 403 for unauthorized access)
-- Session management with secure cookie handling
+- Rate limiting on API endpoints
+- CORS configuration for cross-origin requests
+- Input sanitization and validation at all entry points
 
 ### Testing and Quality Assurance
 
-The application includes a comprehensive testing suite ensuring reliability and code quality:
-
 **Testing Strategy**
-- Complete test coverage with 27 tests and 104 assertions
+- Complete test coverage with feature and unit tests
 - Feature tests validating end-to-end user workflows
 - Unit tests for business logic including billing cycle calculations
 - Database factories and seeders providing consistent test data
@@ -230,8 +361,6 @@ The application includes a comprehensive testing suite ensuring reliability and 
 - Error handling and user feedback systems throughout the application
 
 ### Business Logic and Advanced Features
-
-The application implements sophisticated business logic for subscription management:
 
 **Billing Cycle Management**
 - Support for monthly and annual billing periods
@@ -257,16 +386,28 @@ The application implements sophisticated business logic for subscription managem
 
 ### Technology Stack
 
-**Core Framework and Languages**
-- Laravel 12 (PHP 8.2+) with modern framework features
-- SQLite for development, MySQL for production deployment
-- Blade templating engine with component-based architecture
-- Tailwind CSS for utility-first responsive styling
-- JavaScript with Alpine.js for interactive functionality
+Backend Framework
+- Laravel 12 - Modern PHP framework with robust ecosystem
+- PHP 8.3+ - Latest PHP version with performance improvements
+- MySQL 8.0 - Relational database with JSON support
+- Laravel Passport - OAuth2 server implementation for API authentication
 
-**Development and Build Tools**
-- Composer for PHP dependency management
-- NPM with Vite for modern asset bundling and hot reload
-- Laravel Breeze for authentication scaffolding
-- PHPUnit for comprehensive testing suite
-- Artisan CLI for database migrations and custom commands
+API Architecture
+- RESTful API design following industry standards
+- JSON API responses with consistent formatting
+- API Resources for data transformation and presentation
+- Form Request validation for input validation and business rules
+- Policy-based authorization for fine-grained access control
+
+Development Tools
+- Composer - PHP dependency management
+- Artisan CLI - Laravel's command-line interface
+- PHPUnit - Testing framework with comprehensive test coverage
+- Laravel Factories - Database seeding and testing data generation
+- Event-driven architecture - Decoupled system components
+
+Frontend (Secondary)
+- Blade Templates - Laravel's templating engine
+- Tailwind CSS - Utility-first CSS framework
+- Vite - Modern build tool for asset compilation
+- Alpine.js - Lightweight JavaScript framework for interactivity
