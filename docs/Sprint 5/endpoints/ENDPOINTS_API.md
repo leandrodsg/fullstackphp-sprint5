@@ -56,7 +56,6 @@ GET /api/v1/subscriptions
 POST /api/v1/subscriptions
 GET /api/v1/subscriptions/{id}
 PUT /api/v1/subscriptions/{id}
-PATCH /api/v1/subscriptions/{id}
 PATCH /api/v1/subscriptions/{id}/cancel
 PATCH /api/v1/subscriptions/{id}/reactivate
 DELETE /api/v1/subscriptions/{id}
