@@ -95,4 +95,36 @@ class Subscription extends Model
         // Caso contrário, é mensal
         return 'monthly';
     }
+
+    /**
+     * Calculate days until next billing
+     */
+    public function calculateDaysUntilNextBilling(): ?int
+    {
+        if (!$this->next_billing_date) {
+            return null;
+        }
+
+        return now()->diffInDays($this->next_billing_date, false);
+    }
+
+    /**
+     * Check if subscription is expired
+     */
+    public function isExpired(): bool
+    {
+        if (!$this->next_billing_date) {
+            return false;
+        }
+
+        return now()->isAfter($this->next_billing_date);
+    }
+
+    /**
+     * Get formatted price with currency
+     */
+    public function getPriceWithCurrency(): string
+    {
+        return $this->price . ' ' . $this->currency;
+    }
 }

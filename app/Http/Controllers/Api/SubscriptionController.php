@@ -12,7 +12,7 @@ class SubscriptionController extends BaseController
 {
     public function index()
     {
-        $subscriptions = Subscription::forUser()->get();
+        $subscriptions = Subscription::with('service')->forUser()->get();
         return $this->responseSuccess(SubscriptionResource::collection($subscriptions), 'Subscription list');
     }
 
@@ -42,7 +42,7 @@ class SubscriptionController extends BaseController
 
     public function show($id)
     {
-        $subscription = Subscription::forUser()->find($id);
+        $subscription = Subscription::with('service')->forUser()->find($id);
         if (!$subscription) {
             return $this->responseError('Subscription not found', 404);
         }
@@ -51,7 +51,7 @@ class SubscriptionController extends BaseController
 
     public function update(Request $request, $id)
     {
-        $subscription = Subscription::forUser()->find($id);
+        $subscription = Subscription::with('service')->forUser()->find($id);
         if (!$subscription) {
             return $this->responseError('Subscription not found', 404);
         }
@@ -78,7 +78,7 @@ class SubscriptionController extends BaseController
 
     public function cancel($id)
     {
-        $subscription = Subscription::forUser()->find($id);
+        $subscription = Subscription::with('service')->forUser()->find($id);
         if (!$subscription) {
             return $this->responseError('Subscription not found', 404);
         }
@@ -88,7 +88,7 @@ class SubscriptionController extends BaseController
 
     public function reactivate($id)
     {
-        $subscription = Subscription::forUser()->find($id);
+        $subscription = Subscription::with('service')->forUser()->find($id);
         if (!$subscription) {
             return $this->responseError('Subscription not found', 404);
         }

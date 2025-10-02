@@ -206,8 +206,23 @@ Improvements implemented:
 
 More details: [README_feat_backend_improvements.md](../Sprint%205/development/README_feat_backend_improvements.md)
 
+## 10. Branch feature/improve-subscription-resource
+
+The feature/improve-subscription-resource branch focused on optimizing the SubscriptionResource performance and data completeness by addressing N+1 query issues and adding missing fields that were causing frontend workarounds. This branch was created to resolve specific issues identified in the `/reports/my-expenses` endpoint where `service_name` and `billing_cycle` fields were missing, forcing the frontend team to implement temporary solutions.
+
+Technical improvements implemented:
+- Eager Loading Implementation: Added `->with('service')` to all SubscriptionController methods (index, show, update, cancel, reactivate) to eliminate N+1 queries when loading subscription collections.
+- Service Name Integration: Added `service_name` field to SubscriptionResource by accessing the eager-loaded service relationship (`$this->service->name ?? null`).
+- Calculated Billing Cycle: Implemented `calculateBillingCycle()` method in the Subscription model that intelligently determines billing frequency based on the difference between `created_at` and `next_billing_date` (≥330 days = annual, otherwise monthly).
+- Enhanced Helper Methods: Added `calculateDaysUntilNextBilling()`, `isExpired()`, and `getPriceWithCurrency()` methods to the Subscription model for consistent calculated field generation.
+- Testing: Updated ApiResourcesTest to validate all new fields including `service_name`, `billing_cycle`, and calculated fields, ensuring data integrity and proper eager loading functionality.
+
+The improvements ensure that `GET /api/v1/subscriptions` now provides complete data including `service_name` and `billing_cycle`, eliminating the need for frontend teams to use the limited `/reports/my-expenses` endpoint or implement workarounds for missing data.
+
+More details: [README_feature_improve_subscription_resource.md](../Sprint%205/development/README_feature_improve_subscription_resource.md)
+
 ### LEVEL 2 (API Documentation)
-- 10. Branch docs/api-documentation
+- 11. Branch docs/api-documentation
 
 ### LEVEL 3 (Deployment)
-- 11. Branch deploy/production-setup
+- 12. Branch deploy/production-setup
