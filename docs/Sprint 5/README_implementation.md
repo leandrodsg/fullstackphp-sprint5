@@ -193,8 +193,21 @@ Technical details:
 
 More details: [README_feat_data_export_functionality.md](../Sprint%205/development/README_feat_data_export_functionality.md)
 
+## 9. Branch feat/backend-improvements
+
+The feat/backend-improvements branch focused on enhancing the API's data consistency, user experience, and maintainability through strategic improvements to existing endpoints and resources. These improvements were designed to provide better frontend integration capabilities while maintaining code quality and following Laravel best practices.
+
+Improvements implemented:
+- Automatic Billing Cycle Detection: Enhanced `SubscriptionController` with intelligent billing cycle calculation based on plan names, automatically setting 'annual' for plans containing "Annual" or "Yearly", and 'monthly' for others.
+- Standardized Date Formatting: Implemented consistent ISO 8601 date format across all API resources (`SubscriptionResource` and `ServiceResource`) for `created_at`, `updated_at`, and `next_billing_date` fields.
+- Enhanced API Resources: Added calculated fields to `SubscriptionResource` including `days_until_next_billing`, `is_expired`, and `price_with_currency` for improved frontend data consumption.
+- Robust Input Validation: Strengthened validation rules in both `SubscriptionController` and `ServiceController` with specific constraints for currency codes, date validation, status enums, and foreign key relationships.
+- Testing: Updated and expanded test suites to ensure all improvements work correctly, including dynamic date handling in tests and validation of new calculated fields.
+
+More details: [README_feat_backend_improvements.md](../Sprint%205/development/README_feat_backend_improvements.md)
+
 ### LEVEL 2 (API Documentation)
-- 9. Branch docs/api-documentation
+- 10. Branch docs/api-documentation
 
 ### LEVEL 3 (Deployment)
-- 10. Branch deploy/production-setup
+- 11. Branch deploy/production-setup
