@@ -71,7 +71,7 @@ class SubscriptionApiEndpointsTest extends TestCase
             'plan' => 'Premium',
             'price' => 29.99,
             'currency' => 'USD',
-            'next_billing_date' => '2024-12-01',
+            'next_billing_date' => now()->addDays(30)->format('Y-m-d'),
             'status' => 'active'
         ];
 
@@ -155,7 +155,7 @@ class SubscriptionApiEndpointsTest extends TestCase
             'plan' => 'Basic',
             'price' => 19.99,
             'currency' => 'USD',
-            'next_billing_date' => '2024-12-01',
+            'next_billing_date' => now()->addDays(30)->format('Y-m-d'),
             'status' => 'active'
         ];
 

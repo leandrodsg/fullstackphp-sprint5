@@ -75,4 +75,24 @@ class Subscription extends Model
         
         SubscriptionBillingAdvanced::dispatch($this);
     }
+
+    /**
+     * Calculate billing cycle based on the difference between created_at and next_billing_date
+     */
+    public function calculateBillingCycle(): string
+    {
+        if (!$this->created_at || !$this->next_billing_date) {
+            return 'monthly';
+        }
+
+        $daysDifference = floor($this->created_at->diffInDays($this->next_billing_date));
+
+        // Se a diferença for maior ou igual a 330 dias, consideramos anual
+        if ($daysDifference >= 330) {
+            return 'annual';
+        }
+
+        // Caso contrário, é mensal
+        return 'monthly';
+    }
 }

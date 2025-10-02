@@ -211,4 +211,86 @@ class SubscriptionBillingCycleTest extends TestCase
         $expectedDate = $originalDate->addMonth()->format('Y-m-d');
         $this->assertEquals($expectedDate, $subscription->next_billing_date->format('Y-m-d'));
     }
+
+    /** @test */
+    public function calculate_billing_cycle_returns_monthly_for_30_day_difference()
+    {
+        $user = User::factory()->create();
+        $service = Service::factory()->create(['user_id' => $user->id]);
+        
+        $subscription = Subscription::factory()->create([
+            'user_id' => $user->id,
+            'service_id' => $service->id,
+            'created_at' => now(),
+            'next_billing_date' => now()->addDays(30),
+        ]);
+
+        $this->assertEquals('monthly', $subscription->calculateBillingCycle());
+    }
+
+    /** @test */
+    public function calculate_billing_cycle_returns_annual_for_365_day_difference()
+    {
+        $user = User::factory()->create();
+        $service = Service::factory()->create(['user_id' => $user->id]);
+        
+        $subscription = Subscription::factory()->create([
+            'user_id' => $user->id,
+            'service_id' => $service->id,
+            'created_at' => now(),
+            'next_billing_date' => now()->addDays(365),
+        ]);
+
+        $this->assertEquals('annual', $subscription->calculateBillingCycle());
+    }
+
+    /** @test */
+    public function calculate_billing_cycle_returns_monthly_for_invalid_dates()
+    {
+        $user = User::factory()->create();
+        $service = Service::factory()->create(['user_id' => $user->id]);
+        
+        $subscription = Subscription::factory()->create([
+            'user_id' => $user->id,
+            'service_id' => $service->id,
+            'created_at' => null,
+            'next_billing_date' => now()->addDays(30),
+        ]);
+
+        $this->assertEquals('monthly', $subscription->calculateBillingCycle());
+    }
+
+    /** @test */
+    public function calculate_billing_cycle_handles_edge_cases()
+    {
+        $user = User::factory()->create();
+        $service = Service::factory()->create(['user_id' => $user->id]);
+        
+        $testCases = [
+            ['days' => 25, 'expected' => 'monthly'],
+            ['days' => 35, 'expected' => 'monthly'],
+            ['days' => 329, 'expected' => 'monthly'],
+            ['days' => 330, 'expected' => 'annual'],
+            ['days' => 365, 'expected' => 'annual'],
+            ['days' => 400, 'expected' => 'annual'],
+        ];
+
+        foreach ($testCases as $case) {
+            $createdAt = now()->subDays($case['days'])->startOfDay();
+            $nextBillingDate = now()->startOfDay();
+            
+            $subscription = Subscription::factory()->create([
+                'user_id' => $user->id,
+                'service_id' => $service->id,
+                'created_at' => $createdAt,
+                'next_billing_date' => $nextBillingDate,
+            ]);
+
+            $this->assertEquals(
+                $case['expected'], 
+                $subscription->calculateBillingCycle(),
+                "Failed for {$case['days']} days difference"
+            );
+        }
+    }
 }

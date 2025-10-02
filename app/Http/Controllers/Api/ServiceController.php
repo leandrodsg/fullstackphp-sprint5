@@ -29,10 +29,10 @@ class ServiceController extends BaseController
     public function store(Request $request)
     {
         $data = $request->validate([
-            'name' => 'required|string|max:255',
-            'category' => 'required|string|max:100',
-            'description' => 'nullable|string',
-            'website_url' => 'nullable|url',
+            'name' => 'required|string|max:255|min:2',
+            'category' => 'required|string|max:100|min:2',
+            'description' => 'nullable|string|max:1000',
+            'website_url' => 'nullable|url|max:255',
         ]);
         
         $data['user_id'] = Auth::id();
@@ -61,10 +61,10 @@ class ServiceController extends BaseController
         }
         
         $data = $request->validate([
-            'name' => 'required|string|max:255',
-            'category' => 'required|string|max:100',
-            'description' => 'nullable|string',
-            'website_url' => 'nullable|url',
+            'name' => 'required|string|max:255|min:2',
+            'category' => 'required|string|max:100|min:2',
+            'description' => 'nullable|string|max:1000',
+            'website_url' => 'nullable|url|max:255',
         ]);
         
         $service->update($data);
