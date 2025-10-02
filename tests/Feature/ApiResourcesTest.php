@@ -38,7 +38,7 @@ class ApiResourcesTest extends TestCase
     public function test_subscription_resource_basic_fields(): void
     {
         $user = User::factory()->create();
-        $service = Service::factory()->create(['user_id' => $user->id]);
+        $service = Service::factory()->create(['user_id' => $user->id, 'name' => 'Netflix']);
         
         $subscription = Subscription::create([
             'user_id' => $user->id,
@@ -50,9 +50,13 @@ class ApiResourcesTest extends TestCase
             'status' => 'active'
         ]);
 
+        // Load the service relationship for the test
+        $subscription->load('service');
+
         $resource = new SubscriptionResource($subscription);
         $array = $resource->toArray(request());
 
+        // Test basic fields
         $this->assertArrayHasKey('id', $array);
         $this->assertArrayHasKey('plan', $array);
         $this->assertArrayHasKey('price', $array);
@@ -60,6 +64,19 @@ class ApiResourcesTest extends TestCase
         $this->assertEquals('Premium', $array['plan']);
         $this->assertEquals(15.99, $array['price']);
         $this->assertEquals('USD', $array['currency']);
+
+        // Test new fields
+        $this->assertArrayHasKey('service_name', $array);
+        $this->assertArrayHasKey('billing_cycle', $array);
+        $this->assertEquals('Netflix', $array['service_name']);
+        $this->assertEquals('monthly', $array['billing_cycle']);
+
+        // Test calculated fields
+        $this->assertArrayHasKey('days_until_next_billing', $array);
+        $this->assertArrayHasKey('is_expired', $array);
+        $this->assertArrayHasKey('price_with_currency', $array);
+        $this->assertEquals('15.99 USD', $array['price_with_currency']);
+        $this->assertFalse($array['is_expired']);
     }
 
     public function test_user_resource_safe_data_only(): void
