@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Api\BaseController;
+use App\Http\Resources\SubscriptionResource;
 use App\Models\Subscription;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -12,22 +13,31 @@ class SubscriptionController extends BaseController
     public function index()
     {
         $subscriptions = Subscription::forUser()->get();
-        return $this->responseSuccess($subscriptions, 'Subscription list');
+        return $this->responseSuccess(SubscriptionResource::collection($subscriptions), 'Subscription list');
     }
 
     public function store(Request $request)
     {
         $data = $request->validate([
-            'service_id' => 'required|integer',
-            'plan' => 'required|string',
-            'price' => 'required|numeric',
-            'currency' => 'required|string',
-            'next_billing_date' => 'required|date',
-            'status' => 'required|string',
+            'service_id' => 'required|integer|exists:services,id',
+            'plan' => 'required|string|max:255',
+            'price' => 'required|numeric|min:0',
+            'currency' => 'required|string|size:3|in:USD,EUR,BRL,GBP',
+            'next_billing_date' => 'required|date|after:today',
+            'status' => 'required|string|in:active,inactive,cancelled',
         ]);
         $data['user_id'] = Auth::id();
+        
+        // Definir billing_cycle automaticamente baseado no nome do plano
+        $planName = strtolower($data['plan']);
+        if (str_contains($planName, 'annual') || str_contains($planName, 'yearly')) {
+            $data['billing_cycle'] = 'annual';
+        } else {
+            $data['billing_cycle'] = 'monthly';
+        }
+        
         $subscription = Subscription::create($data);
-        return $this->responseSuccess($subscription, 'Subscription created', 201);
+        return $this->responseSuccess(new SubscriptionResource($subscription), 'Subscription created', 201);
     }
 
     public function show($id)
@@ -36,7 +46,7 @@ class SubscriptionController extends BaseController
         if (!$subscription) {
             return $this->responseError('Subscription not found', 404);
         }
-        return $this->responseSuccess($subscription, 'Subscription details');
+        return $this->responseSuccess(new SubscriptionResource($subscription), 'Subscription details');
     }
 
     public function update(Request $request, $id)
@@ -46,14 +56,14 @@ class SubscriptionController extends BaseController
             return $this->responseError('Subscription not found', 404);
         }
         $data = $request->validate([
-            'plan' => 'required|string',
-            'price' => 'required|numeric',
-            'currency' => 'required|string',
-            'next_billing_date' => 'required|date',
-            'status' => 'required|string',
+            'plan' => 'required|string|max:255',
+            'price' => 'required|numeric|min:0',
+            'currency' => 'required|string|size:3|in:USD,EUR,BRL,GBP',
+            'next_billing_date' => 'required|date|after:today',
+            'status' => 'required|string|in:active,inactive,cancelled',
         ]);
         $subscription->update($data);
-        return $this->responseSuccess($subscription, 'Subscription updated');
+        return $this->responseSuccess(new SubscriptionResource($subscription), 'Subscription updated');
     }
 
     public function destroy($id)
@@ -73,7 +83,7 @@ class SubscriptionController extends BaseController
             return $this->responseError('Subscription not found', 404);
         }
         $subscription->update(['status' => 'cancelled']);
-        return $this->responseSuccess($subscription, 'Subscription cancelled');
+        return $this->responseSuccess(new SubscriptionResource($subscription), 'Subscription cancelled');
     }
 
     public function reactivate($id)
@@ -82,7 +92,21 @@ class SubscriptionController extends BaseController
         if (!$subscription) {
             return $this->responseError('Subscription not found', 404);
         }
-        $subscription->update(['status' => 'active']);
-        return $this->responseSuccess($subscription, 'Subscription reactivated');
+        
+        // Atualizar status e recalcular next_billing_date baseado na data atual
+        $nextBillingDate = now();
+        if (stripos($subscription->plan, 'annual') !== false || stripos($subscription->plan, 'yearly') !== false) {
+            $nextBillingDate = $nextBillingDate->addYear();
+        } else {
+            $nextBillingDate = $nextBillingDate->addMonth();
+        }
+        
+        $subscription->update([
+            'status' => 'active',
+            'next_billing_date' => $nextBillingDate,
+            'created_at' => now() // Atualiza para que calculateBillingCycle funcione corretamente
+        ]);
+        
+        return $this->responseSuccess(new SubscriptionResource($subscription), 'Subscription reactivated');
     }
 }
