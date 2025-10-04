@@ -13,12 +13,12 @@ TechSubs allows users to manage their digital service subscriptions through a RE
 - Subscription Management: Complete CRUD for user subscriptions
 - Automatic Billing Cycle Detection: System that automatically detects if a subscription is monthly or annual based on price
 - Calculated Fields: Automatic fields like days until next billing, expiration status, and formatted price
-- Input Validation: Robust input data validation
+- Input Validation: Input data validation
 - Date Formatting: ISO 8601 standardization for all API dates
 - Reports: Basic endpoints for expense reports
 - Export: CSV data export functionality
 
-## Documentation and Implementation Details
+## Implementation Details
 
 This README provides a high-level overview of the system and installation. For a detailed technical breakdown of the implementation, including branch-by-branch decisions, improvements, and architectural changes, see:
 
@@ -34,8 +34,12 @@ The `docs/` folder contains additional documentation for each feature, API endpo
 
 ### Prerequisites
 
-Before installing TechSubs, ensure your development environment meets these requirements:
+Before installing TechSubs, choose your preferred development environment:
 
+Option 1: Docker (Recommended)
+- Docker Desktop 4.0+
+
+Option 2: Traditional Setup
 - PHP 8.2+ with required extensions:
   - OpenSSL PHP Extension
   - PDO PHP Extension
@@ -64,7 +68,44 @@ Frontend (Node.js):
 - Alpine.js 3.4+ (JavaScript framework)
 - Axios 1.11+ (HTTP client)
 
-### Step-by-Step Installation
+### Installation
+
+#### Option 1: Docker Setup (Recommended)
+
+1. Clone the Repository
+   ```bash
+   git clone https://github.com/leandrodsg/fullstackphp-sprint5.git
+   cd fullstackphp-sprint5/TechSubs_API
+   ```
+
+2. Environment Configuration
+   ```bash
+   cp .env.example .env
+   ```
+
+3. Start with Docker Compose
+   ```bash
+   docker-compose up -d
+   ```
+
+4. Install Dependencies and Setup Database
+   ```bash
+   docker-compose exec app composer install
+   docker-compose exec app php artisan key:generate
+   docker-compose exec app php artisan migrate
+   docker-compose exec app php artisan db:seed
+   docker-compose exec app php artisan passport:install
+   ```
+
+5. Install Frontend Assets
+   ```bash
+   docker-compose exec app npm install
+   docker-compose exec app npm run build
+   ```
+
+The application will be available at `http://localhost:8001`
+
+#### Option 2: Traditional Setup
 
 1. Clone the Repository
    ```bash
@@ -128,29 +169,43 @@ Frontend (Node.js):
 
 The application will be available at `http://localhost:8000`
 
-## Quick Start
+## Test Accounts
 
-After installation, test the API functionality with these commands:
+The system comes with two pre-configured accounts for different testing scenarios:
 
-### Register a new user
-```bash
-curl -X POST http://localhost:8000/api/v1/register \
--H "Content-Type: application/json" \
--d "{\"name\":\"Test User\",\"email\":\"test@test.com\",\"password\":\"TestPassword@123\",\"password_confirmation\":\"TestPassword@123\"}"
-```
+### ADMIN Account (Empty Profile - Testing from Scratch)
+- Email: `admin@example.com`
+- Password: `AdminPassword@123`
+- Role: Administrator
+- Clean slate for testing all functionalities
+
+### USER Account (Complete Test Data)
+- Email: `user@example.com`
+- Password: `UserPassword@123`
+- Role: Regular User
+- Immediate demonstration of system capabilities
+
+### Web Interface Access
+
+1. Login Page: `http://localhost:8001/login`
+2. Dashboard: `http://localhost:8001/dashboard` (after login)
+3. Services: `http://localhost:8001/services`
+4. Subscriptions: `http://localhost:8001/subscriptions`
+
+Note: Traditional setup uses port 8000 instead of 8001.
+
+### API Testing
 
 ### Login and obtain access token
 ```bash
-curl -X POST http://localhost:8000/api/v1/login \
+curl -X POST http://localhost:8001/api/v1/login \
 -H "Content-Type: application/json" \
--d "{\"email\":\"test@test.com\",\"password\":\"TestPassword@123\"}"
+-d "{\"email\":\"user@example.com\",\"password\":\"UserPassword@123\"}"
 ```
-
-Copy the `access_token` from the response for subsequent requests.
 
 ### Create a service using the token
 ```bash
-curl -X POST http://localhost:8000/api/v1/services \
+curl -X POST http://localhost:8001/api/v1/services \
 -H "Authorization: Bearer YOUR_TOKEN_HERE" \
 -H "Content-Type: application/json" \
 -d "{\"name\":\"Netflix\",\"category\":\"Streaming\",\"website_url\":\"https://netflix.com\",\"description\":\"Video streaming service\"}"
@@ -158,7 +213,7 @@ curl -X POST http://localhost:8000/api/v1/services \
 
 ### Create a subscription using the token
 ```bash
-curl -X POST http://localhost:8000/api/v1/subscriptions \
+curl -X POST http://localhost:8001/api/v1/subscriptions \
 -H "Authorization: Bearer YOUR_TOKEN_HERE" \
 -H "Content-Type: application/json" \
 -d "{\"service_id\":1,\"plan\":\"Premium\",\"price\":15.99,\"currency\":\"USD\",\"next_billing_date\":\"2024-02-01\"}"
@@ -166,67 +221,58 @@ curl -X POST http://localhost:8000/api/v1/subscriptions \
 
 ### List user services
 ```bash
-curl -X GET http://localhost:8000/api/v1/services \
+curl -X GET http://localhost:8001/api/v1/services \
 -H "Authorization: Bearer YOUR_TOKEN_HERE"
 ```
 
 ### List user subscriptions
 ```bash
-curl -X GET http://localhost:8000/api/v1/subscriptions \
+curl -X GET http://localhost:8001/api/v1/subscriptions \
 -H "Authorization: Bearer YOUR_TOKEN_HERE"
 ```
 
+For Traditional Setup: Replace `8001` with `8000` in all URLs above.
+
+Copy the `access_token` from the login response for subsequent requests.
+
+## Docker Environment
+
+### Docker Architecture
+
+- Laravel Application: Runs on port 8001
+- PostgreSQL Database: Runs on port 5432 with persistent data storage
+- Nginx: Web server handling PHP-FPM requests
+- PHP-FPM: PHP FastCGI Process Manager for optimal performance
+
 ## Troubleshooting
 
-### Internal Server Error (500)
+### Docker Issues
+
+Container won't start:
 ```bash
-php artisan key:generate
-php artisan config:clear
-php artisan cache:clear
+# Check container status
+docker-compose ps
+
+# View detailed logs
+docker-compose logs app
+docker-compose logs db
+
+# Restart services
+docker-compose down && docker-compose up -d
 ```
 
-### Passport authentication issues
+Port conflicts:
+- If port 8001 is in use, modify `docker-compose.yml` to use a different port
+- Check what's using the port: `netstat -ano | findstr :8001`
+
+Database connection issues:
 ```bash
-php artisan passport:install --force
-php artisan passport:keys --force
-```
+# Verify database is running
+docker-compose exec db psql -U techsubs_user -d techsubs_db -c "\dt"
 
-### Database connection problems
-1. Ensure `.env` file exists (copy from `.env.example`)
-2. For SQLite: verify `database/database.sqlite` file exists
-3. For MySQL: check database credentials in `.env`
-
-### Permission errors (Windows/XAMPP)
-```bash
-chmod -R 775 storage bootstrap/cache
-```
-
-### Migration failures
-```bash
-php artisan migrate:fresh --seed
-```
-
-## Testing Data
-
-### Example service data
-```json
-{
-  "name": "Netflix",
-  "category": "Streaming",
-  "website_url": "https://netflix.com",
-  "description": "Video streaming service"
-}
-```
-
-### Example subscription data
-```json
-{
-  "service_id": 1,
-  "plan": "Premium",
-  "price": 15.99,
-  "currency": "USD",
-  "next_billing_date": "2024-02-01"
-}
+# Reset database
+docker-compose down -v
+docker-compose up -d
 ```
 
 ## Database Schema
@@ -254,8 +300,6 @@ Database Relationships
 - Subscription belongsTo both User and Service
 
 ## API Endpoints
-
-The system provides RESTful API endpoints for all core functionality:
 
 ### Authentication
 - `POST /api/register` — User registration
