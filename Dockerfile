@@ -25,6 +25,7 @@ RUN apk add --no-cache \
     netcat-openbsd \
     nginx \
     supervisor \
+    curl \
     && docker-php-ext-configure pgsql -with-pgsql=/usr/local/pgsql \
     && docker-php-ext-install -j$(nproc) \
         pdo \
