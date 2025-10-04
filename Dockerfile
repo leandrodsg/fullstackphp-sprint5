@@ -49,7 +49,22 @@ RUN mkdir -p /var/www/html/storage/logs \
     && mkdir -p /var/www/html/storage/framework/views \
     && mkdir -p /var/www/html/bootstrap/cache \
     && mkdir -p /run/nginx \
-    && mkdir -p /var/log/supervisor
+    && mkdir -p /var/log/supervisor \
+    && mkdir -p /var/lib/nginx/tmp/client_body \
+    && mkdir -p /var/lib/nginx/tmp/proxy \
+    && mkdir -p /var/lib/nginx/tmp/fastcgi \
+    && mkdir -p /var/lib/nginx/tmp/uwsgi \
+    && mkdir -p /var/lib/nginx/tmp/scgi \
+    && mkdir -p /var/lib/nginx/logs \
+    && mkdir -p /var/log/nginx \
+    && mkdir -p /var/cache/nginx \
+    && touch /var/run/nginx.pid \
+    && chown -R www-data:www-data /var/log/supervisor \
+    && chown -R www-data:www-data /run/nginx \
+    && chown -R www-data:www-data /var/lib/nginx \
+    && chown -R www-data:www-data /var/log/nginx \
+    && chown -R www-data:www-data /var/cache/nginx \
+    && chown www-data:www-data /var/run/nginx.pid
 
 # Copy application files (excluding what's in .dockerignore)
 COPY --chown=www-data:www-data . .
@@ -83,4 +98,4 @@ HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
     CMD curl -f http://localhost:8080/health || exit 1
 
 # Use supervisor to manage multiple processes (nginx + php-fpm)
-CMD ["/usr/bin/supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"]
+CMD ["supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf", "-n"]
