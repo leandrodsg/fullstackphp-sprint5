@@ -48,7 +48,8 @@ RUN mkdir -p /var/www/html/storage/logs \
     && mkdir -p /var/www/html/storage/framework/sessions \
     && mkdir -p /var/www/html/storage/framework/views \
     && mkdir -p /var/www/html/bootstrap/cache \
-    && mkdir -p /run/nginx
+    && mkdir -p /run/nginx \
+    && mkdir -p /var/log/supervisor
 
 # Copy application files (excluding what's in .dockerignore)
 COPY --chown=www-data:www-data . .
