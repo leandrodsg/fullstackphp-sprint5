@@ -225,4 +225,16 @@ More details: [README_feature_improve_subscription_resource.md](../Sprint%205/de
 - 11. Branch docs/api-documentation
 
 ### LEVEL 3 (Deployment)
-- 12. Branch deploy/production-setup
+## 12. Branch deploy/laravel-api-docker
+
+The deploy/laravel-api-docker branch focused on preparing the TechSubs API for production deployment using Docker containerization and cloud infrastructure. This branch implemented a complete deployment strategy with optimized Docker configuration, PostgreSQL integration via Neon, and automated deployment to Render platform.
+
+Technical implementations:
+- Optimized Production Dockerfile: Multi-stage build process removing development dependencies, English comments for international collaboration, and streamlined container size for faster deployments.
+- PostgreSQL Integration: Migration from MySQL to PostgreSQL for production environment, with connection configuration for Neon cloud database service.
+- Render Deployment Configuration: Complete `render.yaml` configuration file with environment variables, health checks, and automatic deployment triggers from GitHub repository.
+- Environment Management: Production-ready environment variable configuration including secure `APP_KEY` generation, database credentials, and logging configuration.
+- Docker Compose Enhancement: Updated development environment to support both local development and production testing scenarios.
+- Deployment Documentation: Comprehensive step-by-step guide for local development, production preparation, and cloud deployment.
+
+More details: [README_deploy_guidance.md](development/README_deploy_guidance.md)
