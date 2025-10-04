@@ -42,29 +42,24 @@ RUN echo "opcache.enable=1" >> /usr/local/etc/php/conf.d/opcache.ini \
     && echo "opcache.revalidate_freq=2" >> /usr/local/etc/php/conf.d/opcache.ini \
     && echo "opcache.fast_shutdown=1" >> /usr/local/etc/php/conf.d/opcache.ini
 
-# Create necessary directories with proper permissions
+# Create necessary directories with proper permissions for non-root execution
 RUN mkdir -p /var/www/html/storage/logs \
     && mkdir -p /var/www/html/storage/framework/cache \
     && mkdir -p /var/www/html/storage/framework/sessions \
     && mkdir -p /var/www/html/storage/framework/views \
     && mkdir -p /var/www/html/bootstrap/cache \
-    && mkdir -p /run/nginx \
-    && mkdir -p /var/log/supervisor \
-    && mkdir -p /var/lib/nginx/tmp/client_body \
-    && mkdir -p /var/lib/nginx/tmp/proxy \
-    && mkdir -p /var/lib/nginx/tmp/fastcgi \
-    && mkdir -p /var/lib/nginx/tmp/uwsgi \
-    && mkdir -p /var/lib/nginx/tmp/scgi \
-    && mkdir -p /var/lib/nginx/logs \
-    && mkdir -p /var/log/nginx \
-    && mkdir -p /var/cache/nginx \
-    && touch /var/run/nginx.pid \
-    && chown -R www-data:www-data /var/log/supervisor \
-    && chown -R www-data:www-data /run/nginx \
-    && chown -R www-data:www-data /var/lib/nginx \
-    && chown -R www-data:www-data /var/log/nginx \
-    && chown -R www-data:www-data /var/cache/nginx \
-    && chown www-data:www-data /var/run/nginx.pid
+    && mkdir -p /var/www/html/tmp/nginx \
+    && mkdir -p /var/www/html/tmp/supervisor \
+    && mkdir -p /var/www/html/tmp/nginx/client_body \
+    && mkdir -p /var/www/html/tmp/nginx/proxy \
+    && mkdir -p /var/www/html/tmp/nginx/fastcgi \
+    && mkdir -p /var/www/html/tmp/nginx/uwsgi \
+    && mkdir -p /var/www/html/tmp/nginx/scgi \
+    && mkdir -p /var/www/html/logs/nginx \
+    && mkdir -p /var/www/html/logs/supervisor \
+    && touch /var/www/html/tmp/nginx.pid \
+    && touch /var/www/html/tmp/supervisord.pid \
+    && chown -R www-data:www-data /var/www/html
 
 # Copy application files (excluding what's in .dockerignore)
 COPY --chown=www-data:www-data . .
