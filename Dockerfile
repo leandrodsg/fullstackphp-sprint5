@@ -15,7 +15,7 @@ RUN composer install \
     --no-progress
 
 # Stage 2: Node.js Builder for Vite
-FROM node:18-alpine AS node-builder
+FROM node:20-alpine AS node-builder
 WORKDIR /app
 
 # Copy package files
