@@ -79,6 +79,9 @@ RUN chown -R www-data:www-data /var/www/html \
 # Configure Nginx for production
 COPY --chown=www-data:www-data nginx.conf /etc/nginx/nginx.conf
 
+# Remove default nginx configuration that might conflict
+RUN rm -f /etc/nginx/conf.d/default.conf
+
 # Configure Supervisor for process management
 COPY --chown=www-data:www-data supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
