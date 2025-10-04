@@ -6,7 +6,7 @@ services:
     plan: free
     region: frankfurt
     branch: main
-    healthCheckPath: /api/v1/test
+    healthCheckPath: /health
     envVars:
       - key: APP_NAME
         value: TechSubs
