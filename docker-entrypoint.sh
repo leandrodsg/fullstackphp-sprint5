@@ -46,9 +46,13 @@ php artisan config:cache
 php artisan route:cache
 php artisan view:cache
 
-# Optimize autoloader
-echo "Optimizing autoloader..."
-composer dump-autoload --optimize --no-dev
+# Optimize autoloader (only if composer is available)
+if command -v composer >/dev/null 2>&1; then
+    echo "Optimizing autoloader..."
+    composer dump-autoload --optimize --no-dev
+else
+    echo "Composer not available, skipping autoloader optimization..."
+fi
 
 # Set proper permissions for storage and cache
 echo "Setting proper permissions..."
