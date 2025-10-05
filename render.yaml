@@ -37,3 +37,14 @@ services:
         value: neondb_owner
       - key: DB_PASSWORD
         value: npg_fuMPB4IvaN6G
+      - key: DB_SSLMODE
+        value: require
+      - key: SESSION_DRIVER
+        value: cookie
+      - key: SESSION_SECURE_COOKIE
+        value: true
+      - key: SESSION_DOMAIN
+        fromService:
+          type: web
+          name: techsubs-api
+          property: host
