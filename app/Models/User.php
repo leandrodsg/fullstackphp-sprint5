@@ -58,4 +58,9 @@ class User extends Authenticatable implements OAuthenticatable
     public function subscriptions(): HasMany {
         return $this->hasMany(Subscription::class);
     }
+
+    public function hasVerifiedEmail(): bool
+    {
+        return true;
+    }
 }
