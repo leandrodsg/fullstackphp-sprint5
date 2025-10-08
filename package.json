@@ -3,7 +3,7 @@
     "private": true,
     "type": "module",
     "scripts": {
-        "build": "vite build",
+        "build": "vite build && node -e \"const fs = require('fs'); const path = require('path'); const vitePath = 'public/build/.vite/manifest.json'; const targetPath = 'public/build/manifest.json'; if (fs.existsSync(vitePath) && !fs.existsSync(targetPath)) { fs.copyFileSync(vitePath, targetPath); console.log('Manifest copied from .vite to build root'); }\"",
         "dev": "vite"
     },
     "devDependencies": {
