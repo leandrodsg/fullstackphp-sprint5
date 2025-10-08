@@ -50,11 +50,15 @@ fi
 echo "Running migrations..."
 php artisan migrate --force
 
-# Run seeders if development environment or if FORCE_SEED is set
-if [ "$APP_ENV" = "local" ] || [ "$FORCE_SEED" = "true" ]; then
+# Run seeders if needed
+if [ "$APP_ENV" = "production" ]; then
+    echo "Skipping seeders in production..."
+else
     echo "Running seeders..."
     php artisan db:seed --force
 fi
+
+echo "Database setup completed!"
 
 # Clear any existing cache
 echo "Clearing existing cache..."

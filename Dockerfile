@@ -115,4 +115,4 @@ HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
     CMD curl -f http://localhost:8080/health || exit 1
 
 # Use supervisor to manage multiple processes (nginx + php-fpm)
-CMD ["supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf", "-n"]
+CMD ["/bin/sh", "-c", "/var/www/html/docker-entrypoint.sh init && supervisord -c /etc/supervisor/conf.d/supervisord.conf -n"]
