@@ -68,9 +68,34 @@ Frontend (Node.js):
 - Alpine.js 3.4+ (JavaScript framework)
 - Axios 1.11+ (HTTP client)
 
+## Quick Start
+
+For immediate setup with minimal configuration, use Docker:
+
+```bash
+git clone https://github.com/leandrodsg/fullstackphp-sprint5.git
+cd fullstackphp-sprint5/TechSubs_API
+cp .env.example .env
+docker-compose up -d
+docker-compose exec app composer install
+docker-compose exec app php artisan key:generate
+docker-compose exec app php artisan migrate
+docker-compose exec app php artisan db:seed
+docker-compose exec app php artisan passport:install
+docker-compose exec app php artisan passport:keys --force
+docker-compose exec app npm install
+docker-compose exec app npm run build
+```
+
+Access the application at `http://localhost:8001` and login with:
+- Email: `user@example.com` 
+- Password: `UserPassword@123`
+
 ### Installation
 
 #### Option 1: Docker Setup (Recommended)
+
+Prerequisites: Docker and Docker Compose installed on your system.
 
 1. Clone the Repository
    ```bash
@@ -82,30 +107,52 @@ Frontend (Node.js):
    ```bash
    cp .env.example .env
    ```
+   The `.env.example` file is pre-configured for Docker with SQLite database.
 
-3. Start with Docker Compose
+3. Start Docker Services
    ```bash
    docker-compose up -d
    ```
+   This starts the web server, database, and other services in the background.
 
-4. Install Dependencies and Setup Database
+4. Install PHP Dependencies
    ```bash
    docker-compose exec app composer install
+   ```
+   Downloads and installs all Laravel packages and dependencies.
+
+5. Generate Application Key
+   ```bash
    docker-compose exec app php artisan key:generate
+   ```
+   Creates a unique encryption key for your Laravel application.
+
+6. Setup Database
+   ```bash
    docker-compose exec app php artisan migrate
    docker-compose exec app php artisan db:seed
-   docker-compose exec app php artisan passport:install
    ```
+   Creates database tables and populates them with sample data.
 
-5. Install Frontend Assets
+7. Configure Laravel Passport (OAuth2)
+   ```bash
+   docker-compose exec app php artisan passport:install
+   docker-compose exec app php artisan passport:keys --force
+   ```
+   Sets up OAuth2 authentication keys and clients for API access.
+
+8. Install and Build Frontend Assets
    ```bash
    docker-compose exec app npm install
    docker-compose exec app npm run build
    ```
+   Installs JavaScript dependencies and compiles CSS/JS assets.
 
 The application will be available at `http://localhost:8001`
 
 #### Option 2: Traditional Setup
+
+Prerequisites: PHP 8.2+, Composer, Node.js 18+, and a database system (SQLite/PostgreSQL/MySQL).
 
 1. Clone the Repository
    ```bash
@@ -117,27 +164,47 @@ The application will be available at `http://localhost:8001`
    ```bash
    composer install
    ```
+   Downloads and installs all Laravel packages and dependencies.
 
-3. Install and Build Frontend Assets
+3. Install Frontend Dependencies
    ```bash
    npm install
-   npm run build
    ```
+   Downloads JavaScript packages and development tools.
 
 4. Environment Configuration
    ```bash
    cp .env.example .env
    php artisan key:generate
    ```
+   Creates your environment file and generates a unique application encryption key.
 
 5. Database Setup
+
+   Option A: SQLite (Recommended for Local Development)
    
-   For SQLite (recommended for development):
+   SQLite requires no additional configuration and works out of the box:
    ```bash
    touch database/database.sqlite
    ```
+   Your `.env` should already have `DB_CONNECTION=sqlite` from the example file.
+
+   Option B: PostgreSQL (Production/Neon Hosting)
    
-   For MySQL, update `.env` file:
+   For PostgreSQL databases (like Neon.tech used in production), update your `.env` file:
+   ```
+   DB_CONNECTION=pgsql
+   DB_HOST=your-neon-host.neon.tech
+   DB_PORT=5432
+   DB_DATABASE=your_database_name
+   DB_USERNAME=your_username
+   DB_PASSWORD=your_password
+   DB_SSLMODE=require
+   ```
+
+   Option C: MySQL (Alternative)
+   
+   For MySQL databases, update your `.env` file:
    ```
    DB_CONNECTION=mysql
    DB_HOST=127.0.0.1
@@ -151,21 +218,32 @@ The application will be available at `http://localhost:8001`
    ```bash
    php artisan migrate
    ```
+   Creates all necessary database tables based on Laravel migration files.
 
 7. Seed Database (Recommended)
    ```bash
    php artisan db:seed
    ```
+   Populates the database with sample users, services, and subscriptions for testing.
 
-8. Install Passport and Generate Keys
+8. Configure Laravel Passport (OAuth2)
    ```bash
    php artisan passport:install
+   php artisan passport:keys --force
    ```
+   Sets up OAuth2 authentication keys and clients for API access.
 
-9. Start Development Server
+9. Build Frontend Assets
    ```bash
-   php artisan serve
+   npm run build
    ```
+   Compiles and optimizes CSS and JavaScript files for production.
+
+10. Start Development Server
+    ```bash
+    php artisan serve
+    ```
+    Starts the Laravel development server on your local machine.
 
 The application will be available at `http://localhost:8000`
 
@@ -245,6 +323,35 @@ Copy the `access_token` from the login response for subsequent requests.
 - PHP-FPM: PHP FastCGI Process Manager for optimal performance
 
 ## Troubleshooting
+
+### Laravel 12 + Passport 13.9 Issues
+
+Token generation fails or API returns "Unauthenticated":
+```bash
+# Clear all caches
+php artisan optimize:clear
+
+# Regenerate Passport keys
+php artisan passport:keys --force
+
+# Verify keys exist
+ls storage/oauth-*.key
+```
+
+Personal Access Client not found:
+```bash
+# Check if personal access client exists
+php artisan tinker
+>>> \DB::table('oauth_personal_access_clients')->get();
+
+# If empty, ensure passport:install was run
+php artisan passport:install
+```
+
+Environment inconsistency between Docker and local:
+- Docker setup automatically handles Passport keys via docker-entrypoint.sh
+- Local setup requires manual execution of passport:keys --force after passport:install
+- Both environments need PASSPORT_PRIVATE_KEY and PASSPORT_PUBLIC_KEY in .env for production
 
 ### Docker Issues
 
