@@ -14,7 +14,23 @@ RUN composer install \
     --prefer-dist \
     --no-progress
 
-# Stage 2: Application Runtime
+# Stage 2: Node.js Builder for Vite
+FROM node:20-alpine AS node-builder
+WORKDIR /app
+
+# Copy package files
+COPY package*.json ./
+
+# Install npm dependencies
+RUN npm ci
+
+# Copy source files needed for build
+COPY . .
+
+# Build assets with Vite
+RUN npm run build
+
+# Stage 3: Application Runtime
 FROM php:8.2-fpm-alpine AS runtime
 WORKDIR /var/www/html
 
@@ -66,6 +82,9 @@ COPY --chown=www-data:www-data . .
 
 # Copy optimized dependencies from composer stage
 COPY --from=composer-builder --chown=www-data:www-data /app/vendor ./vendor
+
+# Copy built assets from node stage
+COPY --from=node-builder --chown=www-data:www-data /app/public/build ./public/build
 
 # Copy Docker-specific environment file
 COPY --chown=www-data:www-data .env.docker .env

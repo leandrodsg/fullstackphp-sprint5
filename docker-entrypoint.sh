@@ -23,6 +23,29 @@ if [ -z "$APP_KEY" ] || [ "$APP_KEY" = "base64:" ]; then
     php artisan key:generate --force
 fi
 
+# Setup Passport keys
+echo "Setting up Passport keys..."
+if [ -n "$PASSPORT_PRIVATE_KEY" ] && [ -n "$PASSPORT_PUBLIC_KEY" ]; then
+    echo "Setting up Passport keys from environment variables..."
+    echo "$PASSPORT_PRIVATE_KEY" | base64 -d > storage/oauth-private.key
+    echo "$PASSPORT_PUBLIC_KEY" | base64 -d > storage/oauth-public.key
+    chmod 600 storage/oauth-private.key
+    chmod 600 storage/oauth-public.key
+    echo "Passport keys configured successfully!"
+else
+    echo "Environment variables not found. Checking for existing keys..."
+    if [ ! -f "storage/oauth-private.key" ] || [ ! -f "storage/oauth-public.key" ]; then
+        echo "Generating new Passport keys..."
+        php artisan passport:keys --force
+        chmod 600 storage/oauth-private.key
+        chmod 600 storage/oauth-public.key
+    else
+        echo "Using existing Passport keys..."
+        chmod 600 storage/oauth-private.key
+        chmod 600 storage/oauth-public.key
+    fi
+fi
+
 # Run migrations
 echo "Running migrations..."
 php artisan migrate --force
@@ -56,7 +79,15 @@ fi
 
 # Set proper permissions for storage and cache
 echo "Setting proper permissions..."
-chmod -R 775 storage bootstrap/cache
+chmod -R 775 storage/app storage/framework storage/logs bootstrap/cache
+chmod 755 storage
+
+# Ensure Passport keys have secure permissions (must be after general permissions)
+if [ -f "storage/oauth-private.key" ] && [ -f "storage/oauth-public.key" ]; then
+    echo "Securing Passport key permissions..."
+    chmod 600 storage/oauth-private.key
+    chmod 600 storage/oauth-public.key
+fi
 
 echo "Laravel application initialization completed!"
 

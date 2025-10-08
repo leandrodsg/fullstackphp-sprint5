@@ -1,7 +1,7 @@
 <?php
 namespace App\Models;
 
-use Illuminate\Contracts\Auth\MustVerifyEmail;
+// use Illuminate\Contracts\Auth\MustVerifyEmail; // Disabled for API compatibility
 use Laravel\Passport\HasApiTokens;
 use Laravel\Passport\Contracts\OAuthenticatable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -9,7 +9,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-class User extends Authenticatable implements MustVerifyEmail, OAuthenticatable
+class User extends Authenticatable implements OAuthenticatable
 {
     public const ROLE_USER = 'user';
     public const ROLE_ADMIN = 'admin';
@@ -57,5 +57,10 @@ class User extends Authenticatable implements MustVerifyEmail, OAuthenticatable
 
     public function subscriptions(): HasMany {
         return $this->hasMany(Subscription::class);
+    }
+
+    public function hasVerifiedEmail(): bool
+    {
+        return true;
     }
 }
