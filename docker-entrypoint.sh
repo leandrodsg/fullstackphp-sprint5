@@ -60,7 +60,13 @@ fi
 
 echo "Database setup completed!"
 
-# Clear any existing cache
+# Rebuild assets if in production and npm is available
+if [ "$APP_ENV" = "production" ] && command -v npm >/dev/null 2>&1; then
+    echo "Rebuilding assets for production..."
+    npm run build
+fi
+
+# Clear any existing cache...
 echo "Clearing existing cache..."
 php artisan cache:clear
 php artisan config:clear
