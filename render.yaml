@@ -47,7 +47,14 @@ services:
       - key: SESSION_DRIVER
         value: database
       - key: SESSION_SECURE_COOKIE
-        value: false
+        value: true
+      - key: SESSION_DOMAIN
+        fromService:
+          type: web
+          name: techsubs-api
+          property: host
+      - key: TRUSTED_PROXIES
+        value: "*"
       - key: SESSION_DOMAIN
         value: ""
       - key: PASSPORT_PRIVATE_KEY
