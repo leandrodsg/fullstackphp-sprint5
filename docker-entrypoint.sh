@@ -67,6 +67,14 @@ php artisan config:clear
 php artisan route:clear
 php artisan view:clear
 
+# Fix Vite manifest issue if needed
+echo "Checking Vite manifest..."
+if [ -f "public/build/.vite/manifest.json" ] && [ ! -f "public/build/manifest.json" ]; then
+    echo "Copying Vite manifest to correct location..."
+    cp public/build/.vite/manifest.json public/build/manifest.json
+    echo "Manifest copied successfully!"
+fi
+
 # Cache configurations for better performance
 echo "Generating optimized cache..."
 php artisan config:cache

@@ -85,6 +85,8 @@ docker-compose exec app php artisan passport:install
 docker-compose exec app php artisan passport:keys --force
 docker-compose exec app npm install
 docker-compose exec app npm run build
+# If you get "Vite manifest not found" error, run:
+# docker-compose exec app cp public/build/.vite/manifest.json public/build/manifest.json
 ```
 
 Access the application at `http://localhost:8001` and login with:
@@ -147,6 +149,12 @@ Prerequisites: Docker and Docker Compose installed on your system.
    docker-compose exec app npm run build
    ```
    Installs JavaScript dependencies and compiles CSS/JS assets.
+
+   **Note:** If you encounter a "Vite manifest not found" error after building, run:
+   ```bash
+   docker-compose exec app cp public/build/.vite/manifest.json public/build/manifest.json
+   ```
+   This issue occurs with Vite 7.0.4+ where the manifest file is placed in a subfolder.
 
 The application will be available at `http://localhost:8001`
 
@@ -238,6 +246,12 @@ Prerequisites: PHP 8.2+, Composer, Node.js 18+, and a database system (SQLite/Po
    npm run build
    ```
    Compiles and optimizes CSS and JavaScript files for production.
+
+   **Note:** If you encounter a "Vite manifest not found" error after building, run:
+   ```bash
+   Copy-Item "public/build/.vite/manifest.json" "public/build/manifest.json"
+   ```
+   This issue occurs with Vite 7.0.4+ where the manifest file is placed in a subfolder.
 
 10. Start Development Server
     ```bash
@@ -352,6 +366,43 @@ Environment inconsistency between Docker and local:
 - Docker setup automatically handles Passport keys via docker-entrypoint.sh
 - Local setup requires manual execution of passport:keys --force after passport:install
 - Both environments need PASSPORT_PRIVATE_KEY and PASSPORT_PUBLIC_KEY in .env for production
+
+### Vite Build Issues
+
+"Vite manifest not found" error after running `npm run build`:
+
+This error occurs because Vite 7.0.4+ places the manifest file in a subfolder, but Laravel looks for it in the build root directory.
+
+```bash
+# Copy manifest file to correct location
+Copy-Item "public/build/.vite/manifest.json" "public/build/manifest.json"
+```
+
+For Docker environment:
+```bash
+# Copy manifest file within Docker container
+docker-compose exec app cp public/build/.vite/manifest.json public/build/manifest.json
+```
+
+This step should be performed after running `npm run build` if you encounter the manifest error.
+
+### Render Deployment Issues
+
+CSS/JS assets not loading (404 errors for build files):
+
+This can occur during Render deployment if the Vite build process doesn't complete properly or if there are caching issues.
+
+```bash
+# Force rebuild of assets during deployment
+npm run build
+
+# Ensure manifest is in correct location (if using Vite 7.0.4+)
+if [ -f "public/build/.vite/manifest.json" ]; then
+    cp public/build/.vite/manifest.json public/build/manifest.json
+fi
+```
+
+The Dockerfile and docker-entrypoint.sh have been updated to handle this automatically, but manual intervention may be required if assets still don't load after deployment.
 
 ### Docker Issues
 

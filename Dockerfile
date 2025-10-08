@@ -30,6 +30,11 @@ COPY . .
 # Build assets with Vite
 RUN npm run build
 
+# Fix Vite 7.0.4+ manifest issue
+RUN if [ -f "public/build/.vite/manifest.json" ]; then \
+        cp public/build/.vite/manifest.json public/build/manifest.json; \
+    fi
+
 # Stage 3: Application Runtime
 FROM php:8.2-fpm-alpine AS runtime
 WORKDIR /var/www/html

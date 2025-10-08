@@ -21,11 +21,6 @@ services:
           type: web
           name: techsubs-api
           property: host
-      - key: ASSET_URL
-        fromService:
-          type: web
-          name: techsubs-api
-          property: host
       - key: LOG_LEVEL
         value: error
       - key: DB_CONNECTION

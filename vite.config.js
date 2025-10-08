@@ -10,10 +10,13 @@ export default defineConfig({
     ],
     build: {
         outDir: 'public/build',
+        manifest: true,
         rollupOptions: {
             output: {
                 manualChunks: undefined,
             }
         }
     },
+    // Ensure proper asset serving in production
+    base: './',
 });
