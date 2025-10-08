@@ -9,7 +9,6 @@ export default defineConfig({
         }),
     ],
     build: {
-        manifest: true,
         outDir: 'public/build',
         rollupOptions: {
             output: {
@@ -17,5 +16,4 @@ export default defineConfig({
             }
         }
     },
-    base: './',
 });
