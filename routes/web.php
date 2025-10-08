@@ -21,6 +21,15 @@ Route::middleware('auth')->group(function () {
     Route::resource('services', ServiceController::class);
     
     Route::resource('subscriptions', SubscriptionController::class);
+    
+    // Rota de teste para verificar problema 419
+    Route::get('/test-419', function () {
+        return view('test-419');
+    })->name('test.419');
+    
+    Route::post('/test-csrf', function () {
+        return back()->with('success', 'CSRF funcionando! Erro 419 foi resolvido.');
+    })->name('test.csrf');
 });
 
 require __DIR__.'/auth.php';
