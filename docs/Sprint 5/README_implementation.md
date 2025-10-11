@@ -238,3 +238,5 @@ Technical implementations:
 - Deployment Documentation: Comprehensive step-by-step guide for local development, production preparation, and cloud deployment.
 
 More details: [README_deploy_guidance.md](development/README_deploy_guidance.md)
+
+---
