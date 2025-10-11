@@ -5,6 +5,7 @@ echo "Starting Laravel application initialization..."
 # Check if we're using PostgreSQL and wait for it
 if [ "$DB_CONNECTION" = "pgsql" ] && [ -n "$DB_HOST" ]; then
     echo "Waiting for PostgreSQL..."
+    echo "Testing connection to $DB_HOST:5432..."
     timeout=60
     while ! nc -z "$DB_HOST" 5432; do
         sleep 1
@@ -15,6 +16,10 @@ if [ "$DB_CONNECTION" = "pgsql" ] && [ -n "$DB_HOST" ]; then
         fi
     done
     echo "PostgreSQL is ready!"
+    
+    # Test database connection
+    echo "Testing database connection..."
+    php artisan tinker --execute="DB::connection()->getPdo(); echo 'Database connection successful!';"
 fi
 
 # Generate application key if not set
@@ -48,15 +53,20 @@ fi
 
 # Run migrations
 echo "Running migrations..."
+echo "Database config: $DB_CONNECTION://$DB_USERNAME@$DB_HOST:$DB_PORT/$DB_DATABASE"
 php artisan migrate --force
 
-# Run seeders if needed
-if [ "$APP_ENV" = "production" ]; then
-    echo "Skipping seeders in production..."
+# Check if migrations succeeded
+if [ $? -eq 0 ]; then
+    echo "Migrations completed successfully!"
 else
-    echo "Running seeders..."
-    php artisan db:seed --force
+    echo "Migrations failed!"
+    exit 1
 fi
+
+# Run seeders if needed
+echo "Running seeders for initial data..."
+php artisan db:seed --force
 
 echo "Database setup completed!"
 
