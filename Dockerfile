@@ -94,17 +94,6 @@ COPY --from=node-builder --chown=www-data:www-data /app/public/build ./public/bu
 # Copy Docker-specific environment file
 COPY --chown=www-data:www-data .env.docker .env
 
-# Set database environment variables directly in Dockerfile
-ENV DB_CONNECTION=pgsql
-ENV DB_HOST=ep-frosty-mountain-aglbvim1-pooler.c-2.eu-central-1.aws.neon.tech
-ENV DB_PORT=5432
-ENV DB_DATABASE=neondb
-ENV DB_USERNAME=neondb_owner
-ENV DB_PASSWORD=npg_uSMi3XZ5TdQn
-ENV DB_SSLMODE=require
-ENV APP_ENV=production
-ENV APP_DEBUG=false
-
 # Set proper permissions in one layer
 RUN chown -R www-data:www-data /var/www/html \
     && chmod -R 755 /var/www/html \
