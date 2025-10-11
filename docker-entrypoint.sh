@@ -66,7 +66,7 @@ fi
 
 # Run migrations
 echo "==> Running migrations..."
-php artisan migrate --force 2>&1 || {
+php artisan migrate --force --no-interaction 2>&1 || {
     echo "ERROR: Migration failed"
     php artisan migrate:status 2>&1 || true
     exit 1

@@ -95,9 +95,11 @@ return [
             'prefix_indexes' => true,
             'search_path' => 'public',
             'sslmode' => env('DB_SSLMODE', 'require'),
-            'options' => [
-                PDO::ATTR_PERSISTENT => env('DB_PERSISTENT', false),
-            ],
+            'options' => extension_loaded('pdo_pgsql') ? [
+                PDO::ATTR_PERSISTENT => false,
+                PDO::ATTR_EMULATE_PREPARES => true,
+                PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+            ] : [],
         ],
 
         'sqlsrv' => [
