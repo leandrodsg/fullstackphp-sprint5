@@ -5,7 +5,7 @@ services:
     dockerfilePath: ./Dockerfile
     plan: free
     region: frankfurt
-    branch: main
+    branch: develop
     healthCheckPath: /health
     envVars:
       - key: APP_NAME

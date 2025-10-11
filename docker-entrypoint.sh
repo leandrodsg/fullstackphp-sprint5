@@ -53,8 +53,12 @@ fi
 
 # Run migrations
 echo "Running migrations..."
-echo "Database config: $DB_CONNECTION://$DB_USERNAME@$DB_HOST:$DB_PORT/$DB_DATABASE"
-php artisan migrate --force
+echo "DB_CONNECTION: $DB_CONNECTION"
+echo "DB_HOST: $DB_HOST" 
+echo "DB_DATABASE: $DB_DATABASE"
+echo "DB_USERNAME: $DB_USERNAME"
+echo "DATABASE_URL: $DATABASE_URL"
+php artisan migrate:fresh --force
 
 # Check if migrations succeeded
 if [ $? -eq 0 ]; then
