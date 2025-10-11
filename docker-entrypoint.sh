@@ -1,6 +1,24 @@
 #!/bin/sh
 
 echo "Starting Laravel application initialization..."
+echo "=== DEBUG ENVIRONMENT ==="
+echo "Current directory: $(pwd)"
+echo "Files in current directory:"
+ls -la
+echo "=== ENV FILE CONTENT ==="
+if [ -f ".env" ]; then
+    echo ".env file exists:"
+    head -10 .env
+else
+    echo ".env file NOT found!"
+fi
+echo "=== ENVIRONMENT VARIABLES ==="
+echo "DB_CONNECTION: $DB_CONNECTION"
+echo "DB_HOST: $DB_HOST" 
+echo "DB_DATABASE: $DB_DATABASE"
+echo "DB_USERNAME: $DB_USERNAME"
+echo "DATABASE_URL: $DATABASE_URL"
+echo "=========================="
 
 # Check if we're using PostgreSQL and wait for it
 if [ "$DB_CONNECTION" = "pgsql" ] && [ -n "$DB_HOST" ]; then
@@ -53,11 +71,10 @@ fi
 
 # Run migrations
 echo "Running migrations..."
-echo "DB_CONNECTION: $DB_CONNECTION"
-echo "DB_HOST: $DB_HOST" 
-echo "DB_DATABASE: $DB_DATABASE"
-echo "DB_USERNAME: $DB_USERNAME"
-echo "DATABASE_URL: $DATABASE_URL"
+echo "=== LARAVEL CONFIG DEBUG ==="
+php artisan config:show database.default
+php artisan config:show database.connections.pgsql.host
+echo "=========================="
 php artisan migrate:fresh --force
 
 # Check if migrations succeeded
