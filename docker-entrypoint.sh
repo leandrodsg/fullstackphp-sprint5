@@ -74,14 +74,41 @@ echo "Running migrations..."
 echo "=== LARAVEL CONFIG DEBUG ==="
 php artisan config:show database.default
 php artisan config:show database.connections.pgsql.host
+echo "=== MIGRATION STATUS CHECK ==="
+php artisan migrate:status || echo "Migration status command failed - probably no migrations table yet"
+echo "=== AVAILABLE MIGRATIONS ==="
+ls -la database/migrations/ | head -5
 echo "=========================="
-php artisan migrate:fresh --force
+php artisan migrate --force --verbose
 
 # Check if migrations succeeded
 if [ $? -eq 0 ]; then
+    echo "=== MIGRATIONS SUCCESS ==="
     echo "Migrations completed successfully!"
+    echo "=== FINAL MIGRATION STATUS ==="
+    php artisan migrate:status
+    echo "=== TABLES CREATED ==="
+    php artisan tinker --execute="
+        echo 'Tables in database: ';
+        \$tables = DB::select('SELECT table_name FROM information_schema.tables WHERE table_schema = \'public\'');
+        foreach(\$tables as \$table) {
+            echo \$table->table_name . PHP_EOL;
+        }
+    "
+    echo "=========================="
 else
-    echo "Migrations failed!"
+    echo "=== MIGRATIONS FAILED ==="
+    echo "Migration failed with exit code: $?"
+    echo "=== DATABASE STATE DEBUG ==="
+    php artisan tinker --execute="
+        try {
+            \$pdo = DB::connection()->getPdo();
+            echo 'PDO Connection successful' . PHP_EOL;
+            echo 'Database name: ' . \$pdo->query('SELECT current_database()')->fetchColumn() . PHP_EOL;
+        } catch(Exception \$e) {
+            echo 'PDO Error: ' . \$e->getMessage() . PHP_EOL;
+        }
+    "
     exit 1
 fi
 
