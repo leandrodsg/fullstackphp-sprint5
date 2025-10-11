@@ -75,6 +75,12 @@ php artisan migrate --force --no-interaction --isolated 2>&1 || {
 echo "✓ Migrations completed!"
 php artisan migrate:status
 
+# Run seeders for initial data
+echo "==> Running database seeders..."
+php artisan db:seed --force 2>&1 || {
+    echo "WARNING: Seeders failed (may already exist)"
+}
+
 # Cache optimization
 echo "==> Optimizing application..."
 php artisan config:cache
