@@ -64,9 +64,9 @@ if [ "$FORCE_CLEAN_DB" = "true" ]; then
     echo "✓ Database cleaned"
 fi
 
-# Run migrations
+# Run migrations (without transactions due to Neon pooling)
 echo "==> Running migrations..."
-php artisan migrate --force --no-interaction 2>&1 || {
+php artisan migrate --force --no-interaction --isolated 2>&1 || {
     echo "ERROR: Migration failed"
     php artisan migrate:status 2>&1 || true
     exit 1
