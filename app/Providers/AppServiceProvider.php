@@ -30,6 +30,9 @@ class AppServiceProvider extends ServiceProvider
         );
 
         // Configure Passport
+        // CRITICAL: Disable UUIDs to use integer IDs (compatible with old migrations)
+        Passport::$clientUuids = false;
+        
         Passport::tokensExpireIn(now()->addDays(15));
         Passport::refreshTokensExpireIn(now()->addDays(30));
         Passport::personalAccessTokensExpireIn(now()->addMonths(6));

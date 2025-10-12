@@ -25,14 +25,9 @@ class AuthController extends Controller
 
     private function ensurePersonalAccessClient(): void
     {
-        // Simply check if personal access client exists, don't try to create
-        // This should be handled by `php artisan passport:install` during deployment
-        if (!Schema::hasTable('oauth_personal_access_clients') || !Schema::hasTable('oauth_clients')) {
-            return;
-        }
-        
-        // If no personal access client exists, this is a deployment issue
-        // The application should fail gracefully or use existing clients
+        // Passport 13.x removed oauth_personal_access_clients table
+        // Personal access tokens work without explicit client setup
+        return;
     }
 
     public function register(Request $request)

@@ -75,11 +75,11 @@ php artisan migrate --force --no-interaction --isolated 2>&1 || {
 echo "✓ Migrations completed!"
 php artisan migrate:status
 
-# Install Passport clients
-echo "==> Installing Passport clients..."
-php artisan passport:install --force 2>&1 || {
-    echo "WARNING: Passport install failed (may already exist)"
-}
+# Install Passport clients (skip - handled manually due to Passport 13 breaking changes)
+# echo "==> Installing Passport clients..."
+# php artisan passport:install --force 2>&1 || {
+#     echo "WARNING: Passport install failed (may already exist)"
+# }
 
 # Run seeders for initial data
 echo "==> Running database seeders..."
