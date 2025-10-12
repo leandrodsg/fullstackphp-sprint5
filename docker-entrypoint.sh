@@ -69,6 +69,8 @@ echo "==> Running migrations..."
 php artisan migrate --force --no-interaction --isolated 2>&1 || {
     echo "ERROR: Migration failed"
     php artisan migrate:status 2>&1 || true
+    echo "==> Showing last Laravel log..."
+    tail -n 50 storage/logs/laravel.log 2>/dev/null || echo "No log file found"
     exit 1
 }
 
@@ -81,10 +83,12 @@ php artisan migrate:status
 #     echo "WARNING: Passport install failed (may already exist)"
 # }
 
-# Run seeders for initial data
+# Run seeders for initial data (includes Passport client creation)
 echo "==> Running database seeders..."
 php artisan db:seed --force 2>&1 || {
-    echo "WARNING: Seeders failed (may already exist)"
+    echo "WARNING: Seeders failed"
+    echo "==> Showing error details..."
+    tail -n 20 storage/logs/laravel.log 2>/dev/null || echo "No log file found"
 }
 
 # Cache optimization
