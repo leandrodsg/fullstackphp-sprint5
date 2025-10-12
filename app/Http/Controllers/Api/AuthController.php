@@ -31,20 +31,29 @@ class AuthController extends Controller
         if (DB::table('oauth_personal_access_clients')->count() > 0) {
             return;
         }
-        /** @var Client $client */
-        $client = Client::create([
-            'name' => 'Personal Access Client',
-            'secret' => Str::random(40),
-            'provider' => 'users',
-            'redirect_uris' => [],
-            'grant_types' => ['personal_access','refresh_token'],
-            'scopes' => [],
-            'personal_access_client' => true,
-            'password_client' => false,
-            'revoked' => false,
+        
+        // Insert client directly with proper boolean casting for PostgreSQL
+        $clientId = Str::uuid()->toString();
+        DB::statement("
+            INSERT INTO oauth_clients (id, name, secret, provider, redirect_uris, grant_types, scopes, personal_access_client, password_client, revoked, created_at, updated_at)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?::boolean, ?::boolean, ?::boolean, ?, ?)
+        ", [
+            $clientId,
+            'Personal Access Client',
+            Str::random(40),
+            'users',
+            json_encode([]),
+            json_encode(['personal_access', 'refresh_token']),
+            json_encode([]),
+            'true',
+            'false',
+            'false',
+            now(),
+            now()
         ]);
+        
         DB::table('oauth_personal_access_clients')->insert([
-            'client_id' => $client->id,
+            'client_id' => $clientId,
             'created_at' => now(),
             'updated_at' => now(),
         ]);
