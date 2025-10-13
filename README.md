@@ -216,16 +216,16 @@ Prerequisites: PHP 8.2+, Composer, Node.js 18+, and a database system (SQLite/Po
    DB_SSLMODE=require
    ```
 
-   Option C: MySQL (Alternative)
+   Option C: MySQL/XAMPP (Alternative)
    
-   For MySQL databases, update your `.env` file:
+   For MySQL databases with XAMPP, update your `.env` file:
    ```
    DB_CONNECTION=mysql
    DB_HOST=127.0.0.1
    DB_PORT=3306
-   DB_DATABASE=techsubs
-   DB_USERNAME=your_username
-   DB_PASSWORD=your_password
+   DB_DATABASE=techsubs_api
+   DB_USERNAME=root
+   DB_PASSWORD=
    ```
 
 6. Run Database Migrations
