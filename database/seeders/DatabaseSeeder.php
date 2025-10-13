@@ -13,26 +13,28 @@ class DatabaseSeeder extends Seeder
 {
     public function run(): void
     {
-        // Create Passport Personal Access Client (CRÍTICO para Passport 13)
-        $this->createPassportClient();
 
         // ADMIN User
-        $admin = User::create([
-            'name' => 'Admin User',
-            'email' => 'admin@example.com',
-            'role' => 'admin',
-            'password' => bcrypt('AdminPassword@123'),
-            'email_verified_at' => now(),
-        ]);
+        $admin = User::firstOrCreate(
+            ['email' => 'admin@example.com'],
+            [
+                'name' => 'Admin User',
+                'role' => 'admin',
+                'password' => bcrypt('AdminPassword@123'),
+                'email_verified_at' => now(),
+            ]
+        );
 
         // USER
-        $user = User::create([
-            'name' => 'Test User',
-            'email' => 'user@example.com',
-            'role' => 'user',
-            'password' => bcrypt('UserPassword@123'),
-            'email_verified_at' => now(),
-        ]);
+        $user = User::firstOrCreate(
+            ['email' => 'user@example.com'],
+            [
+                'name' => 'Test User',
+                'role' => 'user',
+                'password' => bcrypt('UserPassword@123'),
+                'email_verified_at' => now(),
+            ]
+        );
 
         // Create test data for USER
         $this->createTestDataForUser($user);
@@ -163,39 +165,4 @@ class DatabaseSeeder extends Seeder
         }
     }
 
-    /**
-     * Create Passport Personal Access Client
-     * Passport 13 requires this for personal access tokens
-     */
-    private function createPassportClient(): void
-    {
-        // Check if client already exists
-        if (Client::where('personal_access_client', true)->exists()) {
-            $this->command->info('✓ Passport client already exists');
-            return;
-        }
-
-        // Create personal access client with UUID
-        $client = Client::create([
-            'id' => \Illuminate\Support\Str::uuid(),
-            'name' => 'Laravel Personal Access Client',
-            'secret' => null,
-            'provider' => null,
-            'redirect_uris' => '',
-            'grant_types' => null,
-            'scopes' => null,
-            'personal_access_client' => true,
-            'password_client' => false,
-            'revoked' => false,
-        ]);
-
-        // Create personal access client record (direct DB insert - Passport 13 removed the model)
-        DB::table('oauth_personal_access_clients')->insert([
-            'client_id' => $client->id,
-            'created_at' => now(),
-            'updated_at' => now(),
-        ]);
-
-        $this->command->info('✓ Passport personal access client created');
-    }
 }
