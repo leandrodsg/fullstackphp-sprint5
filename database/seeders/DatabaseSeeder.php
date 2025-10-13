@@ -175,8 +175,9 @@ class DatabaseSeeder extends Seeder
             return;
         }
 
-        // Create personal access client
+        // Create personal access client with UUID
         $client = Client::create([
+            'id' => \Illuminate\Support\Str::uuid(),
             'name' => 'Laravel Personal Access Client',
             'secret' => null,
             'provider' => null,
