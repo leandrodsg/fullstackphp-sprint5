@@ -25,7 +25,7 @@ class AuthController extends Controller
 
     private function ensurePersonalAccessClient(): void
     {
-        if (!Schema::hasTable('oauth_personal_access_clients') || !Schema::hasTable('oauth_clients')) {
+        if (!Schema::hasTable('oauth_personal_access_clients') || !Schema::hasTable('oauth_clients')) { 
             return;
         }
         if (DB::table('oauth_personal_access_clients')->count() > 0) {

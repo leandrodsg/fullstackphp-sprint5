@@ -39,15 +39,18 @@ bootstrap/cache/*
 
 # Documentation
 README.md
+CHANGELOG.md
 docs/
+erro_deploy.md
 
 # Docker files (avoid recursion)
 Dockerfile
 docker-compose.yml
-# docker-entrypoint.sh - Need this file for container startup
+docker-entrypoint-clean.sh
 
 # Testing
 tests/
+phpunit.xml
 phpunit.xml
 .phpunit.result.cache
 

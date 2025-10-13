@@ -6,11 +6,16 @@ use Illuminate\Database\Seeder;
 use App\Models\User;
 use App\Models\Service;
 use App\Models\Subscription;
+use Laravel\Passport\Client;
+use Illuminate\Support\Facades\DB;
 
 class DatabaseSeeder extends Seeder
 {
     public function run(): void
     {
+        // Create Passport Personal Access Client (CRÍTICO para Passport 13)
+        $this->createPassportClient();
+
         // ADMIN User
         $admin = User::create([
             'name' => 'Admin User',
@@ -156,5 +161,40 @@ class DatabaseSeeder extends Seeder
         foreach ($subscriptions as $subscriptionData) {
             Subscription::create($subscriptionData);
         }
+    }
+
+    /**
+     * Create Passport Personal Access Client
+     * Passport 13 requires this for personal access tokens
+     */
+    private function createPassportClient(): void
+    {
+        // Check if client already exists
+        if (Client::where('personal_access_client', true)->exists()) {
+            $this->command->info('✓ Passport client already exists');
+            return;
+        }
+
+        // Create personal access client
+        $client = Client::create([
+            'name' => 'Laravel Personal Access Client',
+            'secret' => null,
+            'provider' => null,
+            'redirect_uris' => '',
+            'grant_types' => null,
+            'scopes' => null,
+            'personal_access_client' => true,
+            'password_client' => false,
+            'revoked' => false,
+        ]);
+
+        // Create personal access client record (direct DB insert - Passport 13 removed the model)
+        DB::table('oauth_personal_access_clients')->insert([
+            'client_id' => $client->id,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $this->command->info('✓ Passport personal access client created');
     }
 }

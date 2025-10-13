@@ -45,51 +45,26 @@ fi
 
 # Run migrations with error handling
 echo "==> Running database migrations..."
+php artisan migrate:status 2>&1 | grep -q "Migration table not found" && {
+    echo "==> Creating migrations table..."
+}
 
-# Clear any cached config first
-php artisan config:clear
-
-# Check if force clean is requested
-if [ "$FORCE_CLEAN_DB" = "true" ]; then
-    echo "⚠ FORCE_CLEAN_DB enabled - dropping all tables..."
-    php artisan tinker --execute="
-        \$tables = DB::select('SELECT tablename FROM pg_tables WHERE schemaname = \'public\'');
-        DB::statement('SET session_replication_role = \'replica\';');
-        foreach (\$tables as \$table) {
-            echo 'Dropping: ' . \$table->tablename . PHP_EOL;
-            DB::statement('DROP TABLE IF EXISTS \"' . \$table->tablename . '\" CASCADE');
+# Try to run migrations
+if ! php artisan migrate --force 2>&1; then
+    echo "WARNING: Migration failed, attempting to reset..."
+    # Try fresh migration only in development/staging
+    if [ "$APP_ENV" != "production" ]; then
+        php artisan migrate:fresh --force --seed 2>&1 || {
+            echo "ERROR: Fresh migration also failed"
+            exit 1
         }
-        DB::statement('SET session_replication_role = \'origin\';');
-    " 2>&1
-    echo "✓ Database cleaned"
+    else
+        echo "ERROR: Migration failed in production"
+        exit 1
+    fi
 fi
 
-# Run migrations (without transactions due to Neon pooling)
-echo "==> Running migrations..."
-php artisan migrate --force --no-interaction --isolated 2>&1 || {
-    echo "ERROR: Migration failed"
-    php artisan migrate:status 2>&1 || true
-    echo "==> Showing last Laravel log..."
-    tail -n 50 storage/logs/laravel.log 2>/dev/null || echo "No log file found"
-    exit 1
-}
-
-echo "✓ Migrations completed!"
-php artisan migrate:status
-
-# Install Passport clients (skip - handled manually due to Passport 13 breaking changes)
-# echo "==> Installing Passport clients..."
-# php artisan passport:install --force 2>&1 || {
-#     echo "WARNING: Passport install failed (may already exist)"
-# }
-
-# Run seeders for initial data (includes Passport client creation)
-echo "==> Running database seeders..."
-php artisan db:seed --force 2>&1 || {
-    echo "WARNING: Seeders failed"
-    echo "==> Showing error details..."
-    tail -n 20 storage/logs/laravel.log 2>/dev/null || echo "No log file found"
-}
+echo "==> Migrations completed successfully!"
 
 # Cache optimization
 echo "==> Optimizing application..."

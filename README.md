@@ -82,6 +82,7 @@ docker-compose exec app php artisan key:generate
 docker-compose exec app php artisan migrate
 docker-compose exec app php artisan db:seed
 docker-compose exec app php artisan passport:install
+# When prompted about migrations, select NO
 docker-compose exec app php artisan passport:keys --force
 docker-compose exec app npm install
 docker-compose exec app npm run build
@@ -139,6 +140,11 @@ Prerequisites: Docker and Docker Compose installed on your system.
 7. Configure Laravel Passport (OAuth2)
    ```bash
    docker-compose exec app php artisan passport:install
+   ```
+   **Important:** When prompted "Would you like to run all pending database migrations?", select **NO** since we already ran migrations in step 6.
+   
+   Then generate the encryption keys:
+   ```bash
    docker-compose exec app php artisan passport:keys --force
    ```
    Sets up OAuth2 authentication keys and clients for API access.
@@ -237,6 +243,11 @@ Prerequisites: PHP 8.2+, Composer, Node.js 18+, and a database system (SQLite/Po
 8. Configure Laravel Passport (OAuth2)
    ```bash
    php artisan passport:install
+   ```
+   **Important:** When prompted "Would you like to run all pending database migrations?", select **NO** since we already ran migrations in step 6.
+   
+   Then generate the encryption keys:
+   ```bash
    php artisan passport:keys --force
    ```
    Sets up OAuth2 authentication keys and clients for API access.
@@ -288,16 +299,32 @@ Note: Traditional setup uses port 8000 instead of 8001.
 
 ### API Testing
 
+The API endpoints vary depending on your setup method:
+
+**Docker Setup:**
+- Base URL: `http://localhost:8001/api/v1`
+- Used when following Option 1 (Docker) installation
+
+**Traditional Setup (XAMPP/Local):**
+- Base URL: `http://localhost:8000/api/v1`  
+- Used when following Option 2 (Traditional) installation
+
+**Production (Render):**
+- Base URL: `https://techsubs-api.onrender.com/api/v1`
+- Live production environment
+
+**Note:** The Postman Collection is configured for Traditional Setup (port 8000). If using Docker, change the `base_url` variable to `http://localhost:8001/api/v1` in Postman.
+
 ### Login and obtain access token
 ```bash
-curl -X POST http://localhost:8001/api/v1/login \
+curl -X POST http://localhost:8000/api/v1/login \
 -H "Content-Type: application/json" \
 -d "{\"email\":\"user@example.com\",\"password\":\"UserPassword@123\"}"
 ```
 
 ### Create a service using the token
 ```bash
-curl -X POST http://localhost:8001/api/v1/services \
+curl -X POST http://localhost:8000/api/v1/services \
 -H "Authorization: Bearer YOUR_TOKEN_HERE" \
 -H "Content-Type: application/json" \
 -d "{\"name\":\"Netflix\",\"category\":\"Streaming\",\"website_url\":\"https://netflix.com\",\"description\":\"Video streaming service\"}"
@@ -305,27 +332,71 @@ curl -X POST http://localhost:8001/api/v1/services \
 
 ### Create a subscription using the token
 ```bash
-curl -X POST http://localhost:8001/api/v1/subscriptions \
+curl -X POST http://localhost:8000/api/v1/subscriptions \
 -H "Authorization: Bearer YOUR_TOKEN_HERE" \
 -H "Content-Type: application/json" \
--d "{\"service_id\":1,\"plan\":\"Premium\",\"price\":15.99,\"currency\":\"USD\",\"next_billing_date\":\"2024-02-01\"}"
+-d "{\"service_id\":1,\"plan\":\"Premium\",\"price\":15.99,\"currency\":\"USD\",\"next_billing_date\":\"2024-12-01\",\"status\":\"active\"}"
 ```
 
 ### List user services
 ```bash
-curl -X GET http://localhost:8001/api/v1/services \
+curl -X GET http://localhost:8000/api/v1/services \
 -H "Authorization: Bearer YOUR_TOKEN_HERE"
 ```
 
 ### List user subscriptions
 ```bash
-curl -X GET http://localhost:8001/api/v1/subscriptions \
+curl -X GET http://localhost:8000/api/v1/subscriptions \
 -H "Authorization: Bearer YOUR_TOKEN_HERE"
 ```
 
-For Traditional Setup: Replace `8001` with `8000` in all URLs above.
+For Docker Setup: Replace `8000` with `8001` in all URLs above.
 
-Copy the `access_token` from the login response for subsequent requests.
+Copy the `token` from the login response data field for subsequent requests.
+
+Example login response:
+```json
+{
+  "success": true,
+  "message": "Login successful", 
+  "data": {
+    "user": {...},
+    "token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9..."
+  }
+}
+```
+
+## Postman Collection
+
+The file `docs/Sprint 5/endpoints/POSTMAN_COLLECTION.json` contains a ready-to-import collection for testing all endpoints.
+
+### Using Postman Collection with Different Setups
+
+The collection is pre-configured for Traditional Setup (localhost:8000). To use with other setups:
+
+**For Docker Setup:**
+1. Import the collection into Postman
+2. Go to Variables tab in the collection
+3. Change `base_url` from `http://localhost:8000/api/v1` to `http://localhost:8001/api/v1`
+
+**For Production Testing:**
+1. Change `base_url` to `https://techsubs-api.onrender.com/api/v1`
+2. Use real production credentials or test accounts
+
+**Testing Workflow:**
+1. Run "Login" request first to get access token
+2. Token is automatically saved to collection variables
+3. All other requests will use the token automatically
+
+**API Response Format:**
+All API endpoints return responses in this consistent format:
+```json
+{
+  "success": true/false,
+  "message": "Description of the result",
+  "data": {} // The actual response data
+}
+```
 
 ## Docker Environment
 
@@ -337,6 +408,26 @@ Copy the `access_token` from the login response for subsequent requests.
 - PHP-FPM: PHP FastCGI Process Manager for optimal performance
 
 ## Troubleshooting
+
+### Passport Installation Issues
+
+Error: "Base table or view already exists: oauth_auth_codes"
+
+This occurs when `passport:install` tries to run migrations that were already executed. This happens because:
+1. You ran `php artisan migrate` (which includes Passport tables from our custom migrations)
+2. Then `passport:install` tries to run the same migrations again
+
+Solution:
+When `passport:install` asks "Would you like to run all pending database migrations?", always answer **NO**.
+Then run `php artisan passport:keys --force` separately.
+
+**Correct sequence:**
+```bash
+php artisan migrate          # Creates all tables including Passport tables
+php artisan db:seed         # Populates with sample data
+php artisan passport:install # Select NO when asked about migrations
+php artisan passport:keys --force  # Generate encryption keys
+```
 
 ### Laravel 12 + Passport 13.9 Issues
 
@@ -460,28 +551,36 @@ Database Relationships
 ## API Endpoints
 
 ### Authentication
-- `POST /api/register` — User registration
-- `POST /api/login` — User login
-- `POST /api/logout` — User logout
-- `GET /api/user` — Get authenticated user profile
+- `POST /api/v1/register` — User registration
+- `POST /api/v1/login` — User login
+- `POST /api/v1/logout` — User logout
+- `GET /api/v1/profile` — Get authenticated user profile
+- `GET /api/v1/user` — Get authenticated user profile (alias)
+- `PUT /api/v1/change-password` — Change user password
 
 ### Services Management
-- `GET /api/services` — List user services
-- `POST /api/services` — Create new service
-- `GET /api/services/{id}` — Get specific service
-- `PUT /api/services/{id}` — Update service
-- `DELETE /api/services/{id}` — Delete service
+- `GET /api/v1/services` — List user services
+- `POST /api/v1/services` — Create new service
+- `GET /api/v1/services/{id}` — Get specific service
+- `PUT /api/v1/services/{id}` — Update service
+- `PATCH /api/v1/services/{id}` — Partial update service
+- `DELETE /api/v1/services/{id}` — Delete service
+
+### Categories
+- `GET /api/v1/categories` — List available categories
 
 ### Subscriptions Management
-- `GET /api/subscriptions` — List user subscriptions
-- `POST /api/subscriptions` — Create new subscription
-- `GET /api/subscriptions/{id}` — Get specific subscription
-- `PUT /api/subscriptions/{id}` — Update subscription
-- `DELETE /api/subscriptions/{id}` — Delete subscription
+- `GET /api/v1/subscriptions` — List user subscriptions
+- `POST /api/v1/subscriptions` — Create new subscription
+- `GET /api/v1/subscriptions/{id}` — Get specific subscription
+- `PUT /api/v1/subscriptions/{id}` — Update subscription
+- `DELETE /api/v1/subscriptions/{id}` — Delete subscription
+- `PATCH /api/v1/subscriptions/{id}/cancel` — Cancel subscription
+- `PATCH /api/v1/subscriptions/{id}/reactivate` — Reactivate subscription
 
 ### Reports
-- `GET /api/reports/my-expenses` — Get expense reports
-- `GET /api/reports/my-expenses/export` — Export expenses as CSV
+- `GET /api/v1/reports/my-expenses` — Get expense reports
+- `GET /api/v1/reports/my-expenses/export` — Export expenses as CSV
 
 ## Security Features
 

@@ -12,9 +12,9 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('oauth_device_codes', function (Blueprint $table) {
-            $table->char('id', 80)->primary();
-            $table->foreignId('user_id')->nullable()->index();
-            $table->foreignUuid('client_id')->index();
+            $table->string('id', 100)->primary();
+            $table->nullableMorphs('user');
+            $table->unsignedBigInteger('client_id')->index();
             $table->char('user_code', 8)->unique();
             $table->text('scopes');
             $table->boolean('revoked');
