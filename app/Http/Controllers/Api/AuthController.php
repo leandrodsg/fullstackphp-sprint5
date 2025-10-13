@@ -25,9 +25,29 @@ class AuthController extends Controller
 
     private function ensurePersonalAccessClient(): void
     {
-        // Passport 13.x removed oauth_personal_access_clients table
-        // Personal access tokens work without explicit client setup
-        return;
+        if (!Schema::hasTable('oauth_personal_access_clients') || !Schema::hasTable('oauth_clients')) { 
+            return;
+        }
+        if (DB::table('oauth_personal_access_clients')->count() > 0) {
+            return;
+        }
+        /** @var Client $client */
+        $client = Client::create([
+            'name' => 'Personal Access Client',
+            'secret' => Str::random(40),
+            'provider' => 'users',
+            'redirect_uris' => [],
+            'grant_types' => ['personal_access','refresh_token'],
+            'scopes' => [],
+            'personal_access_client' => true,
+            'password_client' => false,
+            'revoked' => false,
+        ]);
+        DB::table('oauth_personal_access_clients')->insert([
+            'client_id' => $client->id,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
     }
 
     public function register(Request $request)
