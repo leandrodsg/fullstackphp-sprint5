@@ -2,19 +2,19 @@
 
 echo "==> Starting Laravel Application Initialization"
 
-# Wait for PostgreSQL
-if [ "$DB_CONNECTION" = "pgsql" ] && [ -n "$DB_HOST" ]; then
-    echo "==> Waiting for PostgreSQL..."
+# Wait for MySQL
+if [ "$DB_CONNECTION" = "mysql" ] && [ -n "$DB_HOST" ]; then
+    echo "==> Waiting for MySQL..."
     timeout=60
-    while ! nc -z "$DB_HOST" 5432; do
+    while ! nc -z "$DB_HOST" 3306; do
         sleep 1
         timeout=$((timeout - 1))
         if [ $timeout -eq 0 ]; then
-            echo "ERROR: Timeout waiting for PostgreSQL"
+            echo "ERROR: Timeout waiting for MySQL"
             exit 1
         fi
     done
-    echo "==> PostgreSQL is ready!"
+    echo "==> MySQL is ready!"
 fi
 
 # Generate APP_KEY if not set
@@ -52,21 +52,16 @@ php artisan config:clear
 # Check if force clean is requested
 if [ "$FORCE_CLEAN_DB" = "true" ]; then
     echo "⚠ FORCE_CLEAN_DB enabled - dropping all tables..."
-    php artisan tinker --execute="
-        \$tables = DB::select('SELECT tablename FROM pg_tables WHERE schemaname = \'public\'');
-        DB::statement('SET session_replication_role = \'replica\';');
-        foreach (\$tables as \$table) {
-            echo 'Dropping: ' . \$table->tablename . PHP_EOL;
-            DB::statement('DROP TABLE IF EXISTS \"' . \$table->tablename . '\" CASCADE');
-        }
-        DB::statement('SET session_replication_role = \'origin\';');
-    " 2>&1
+    php artisan db:wipe --force 2>&1 || {
+        echo "ERROR: Failed to wipe database."
+        exit 1
+    }
     echo "✓ Database cleaned"
 fi
 
 # Run migrations (without transactions due to Neon pooling)
 echo "==> Running migrations..."
-php artisan migrate --force --no-interaction --isolated 2>&1 || {
+php artisan migrate --force --no-interaction 2>&1 || {
     echo "ERROR: Migration failed"
     php artisan migrate:status 2>&1 || true
     echo "==> Showing last Laravel log..."

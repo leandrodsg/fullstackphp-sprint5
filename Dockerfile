@@ -41,16 +41,15 @@ WORKDIR /var/www/html
 
 # Install system dependencies and PHP extensions in one layer
 RUN apk add --no-cache \
-    postgresql-dev \
+    mariadb-dev \
     git \
     netcat-openbsd \
     nginx \
     supervisor \
     curl \
-    && docker-php-ext-configure pgsql -with-pgsql=/usr/local/pgsql \
     && docker-php-ext-install -j$(nproc) \
         pdo \
-        pdo_pgsql \
+        pdo_mysql \
         opcache \
     && rm -rf /var/cache/apk/* \
     && rm -rf /tmp/*

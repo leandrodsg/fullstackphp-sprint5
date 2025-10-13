@@ -4,8 +4,10 @@ services:
       context: .
       dockerfile: Dockerfile
     ports:
-      - "8001:8080"
+      - "8001:80"
     volumes:
-      - .:/var/www/html
-    environment:
-      - APP_ENV=local
+      - .:/var/www/html:delegated
+    env_file:
+      - .env.docker
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
